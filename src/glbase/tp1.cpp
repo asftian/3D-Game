@@ -1,6 +1,6 @@
 #include "tp1.h"
 
-CoreTP1::CoreTP1() : Core(), b(vec3(10, 1, 1), vec3(1, 0, 0)), f(0)
+CoreTP1::CoreTP1() : Core(), b(vec3(1, 1, 1), vec3(1, 0, 0)), f(0)
 {
 	_viewMatrix = glm::lookAt(glm::vec3(0, 1, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
