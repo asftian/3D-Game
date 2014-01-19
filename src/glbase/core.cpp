@@ -31,6 +31,9 @@ void Core::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(_shaderProgram);
+
+		//glUniformMatrix is used to modify a matrix or an array of matrix
+		//void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 		glUniformMatrix4fv(_uniform_projectionMatrix, 1, GL_FALSE, glm::value_ptr(_projectionMatrix));
 		glUniformMatrix4fv(_uniform_viewMatrix, 1, GL_FALSE, glm::value_ptr(_viewMatrix));
 
