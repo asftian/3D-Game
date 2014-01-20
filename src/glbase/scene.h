@@ -18,7 +18,8 @@ public:
 
 	Node();
 	void SetTransform(const mat4 &transform);
-	void AddChild(const Node &child);
+	void AddChild(Node &child);
+	Node* GetParent();
 protected:
 	glm::mat4 fullTransform();
 

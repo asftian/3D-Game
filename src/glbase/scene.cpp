@@ -1,4 +1,5 @@
 #include "scene.h"
+#include <iostream>
 
 #pragma region NODE
 
@@ -19,26 +20,43 @@ void Node::InitializePostLink(GLuint program)
 
 Node::Node()
 	: _transform(), _children(), _parent(nullptr)
-{ }
+{
+	
+}
 
 void Node::SetTransform(const mat4 &transform)
 {
 	_transform = transform;
 }
 
-void Node::AddChild(const Node &child)
+void Node::AddChild(Node &child)
 {
+	
 	_children.push_back(child);
-	_children[_children.size() - 1]._parent = this;
+	child._parent = this;
+	//_children[_children.size() - 1]._parent = this;
+
+}
+
+Node* Node::GetParent()
+{
+	return _parent;
 }
 
 glm::mat4 Node::fullTransform()
 {
+	float shear[16] = {
+		1, 0, 0, 0,
+		-0.2, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1 };
+
 	if (_parent == nullptr)
 		return _transform;
 	else
 		return _parent->fullTransform() * _transform;
 }
+
 
 #pragma endregion
 
