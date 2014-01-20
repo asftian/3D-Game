@@ -29,13 +29,10 @@ void Node::SetTransform(const mat4 &transform)
 	_transform = transform;
 }
 
-void Node::AddChild(Node &child)
+void Node::AddChild(Node *child)
 {
-	
 	_children.push_back(child);
-	child._parent = this;
-	//_children[_children.size() - 1]._parent = this;
-
+	child->_parent = this;
 }
 
 Node* Node::GetParent()

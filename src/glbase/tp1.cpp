@@ -8,7 +8,7 @@ plane(vec3(4,0.1f,4), vec3(0,1,0)),
 f(0)
 {
 	/******* BABY MAKING ******/
-	b.AddChild(b2);
+	b.AddChild(&b2);
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 

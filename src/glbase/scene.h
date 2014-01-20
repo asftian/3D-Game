@@ -18,13 +18,13 @@ public:
 
 	Node();
 	void SetTransform(const mat4 &transform);
-	void AddChild(Node &child);
+	void AddChild(Node *child);
 	Node* GetParent();
 protected:
 	glm::mat4 fullTransform();
 
 	mat4 _transform;
-	std::vector<Node> _children;
+	std::vector<Node*> _children;
 	Node* _parent;
 
 	static GLint uniform_model, uniform_color;
@@ -49,7 +49,7 @@ public:
 	virtual void Render() override;
 protected:
 	vec3 _size;
-};
+};	
 
 class Cylinder : public Shape
 {
