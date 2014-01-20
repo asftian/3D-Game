@@ -49,3 +49,21 @@ public:
 protected:
 	vec3 _size;
 };
+
+class Cylinder : public Shape
+{
+public:
+	Cylinder(float radius, float height, vec3 color);
+
+	virtual void Render() override;
+protected:
+	float _radius, _height;
+};
+class Sphere : public Shape
+{
+public:
+	Sphere(float radius, vec3 color);
+	virtual void Render() override;
+protected:
+	float _radius;
+};

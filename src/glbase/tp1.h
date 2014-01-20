@@ -14,5 +14,7 @@ protected:
 
 protected:
 	Box b;
+	Box plane;
 	float f;
+	
 };
