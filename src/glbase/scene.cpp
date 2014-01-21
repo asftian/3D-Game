@@ -177,23 +177,30 @@ Cylinder::Cylinder(double radius, double height, vec3 color): _radius(radius), _
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
 
-	// Top circle
 	VertexPositionNormal vertices[1440];
+
+	// Top circle
 	vertices[0] = { vec3(0, _height/2, 0), vec3(0, 1, 0) };
 	for (int i = 1; i < 360; i ++)
 	{
 		double theta = 2 * glm::pi<double>() / 360 - i;
 		vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0, 1, 0) };
-		vertices[2 * i + 719] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius) };
 	}
+
 	// Bottom circle
 	vertices[360] = { vec3(0, -(_height / 2), 0), vec3(0, -1, 0) };
 	for (int i = 1; i < 360; i++)
 	{
 		double theta = 2 * glm::pi<double>() / 360 - i;
 		vertices[i + 360] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(0, -1, 0) };
-		
-		vertices[2 * i + 720] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius) };
+	}
+
+	// Sides
+	for (int i = 0; i < 360; i++)
+	{
+		double theta = 2 * glm::pi<double>() / 360 - i;
+		vertices[2*i + 720] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius) };
+		vertices[2*i + 721] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius) };
 	}
 	
 
@@ -219,6 +226,7 @@ Cylinder::Cylinder(double radius, double height, vec3 color): _radius(radius), _
 	debugGLError();
 
 }
+
 void Cylinder::Render()
 {
 	Shape::Render();
@@ -228,6 +236,4 @@ void Cylinder::Render()
 	glDrawArrays(GL_TRIANGLE_STRIP, 720, 720);
 	
 }
-
-
 #pragma endregion
