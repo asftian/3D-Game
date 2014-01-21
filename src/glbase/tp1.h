@@ -18,6 +18,7 @@ protected:
 	Box plane;
 	Cylinder c1;
 	float f;
+	glm::mat4 b_set_pos;
 	glm::mat4 b2_set_pos;
 	glm::mat4 plan_set_pos;
 	glm::mat4 c1_set_pos;

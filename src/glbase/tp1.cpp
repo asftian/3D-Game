@@ -10,7 +10,6 @@ f(0)
 {
 	/******* BABY MAKING ******/
 	b.AddChild(&b2);
-	//b.AddChild(&c1);
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 
@@ -23,18 +22,21 @@ f(0)
 		-0.2, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1 };
+
 	float shearInverted[16] = {
 		1, 0, 0, 0,
 		0.2, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1 };
+
 	shear_matrix = glm::make_mat4(shear);
 	shear_matrix_inv = glm::make_mat4(shearInverted);
 
 	//TRANSLATION MATRIX
+	b_set_pos = (glm::translate(glm::mat4(), glm::vec3(0, 0.25, 0)));
 	b2_set_pos = (glm::translate(glm::mat4(), glm::vec3(0, 0.4, 0)));
-	c1_set_pos = (glm::translate(glm::mat4(), glm::vec3(-1.0, 0.0, 0)));
-	plan_set_pos = glm::translate(glm::mat4(), glm::vec3(0, -0.8, 0));
+	c1_set_pos = (glm::translate(glm::mat4(), glm::vec3(-1.0, 0.2, 0)));
+	plan_set_pos = glm::translate(glm::mat4(), glm::vec3(0, 0, 0));
 	
 
 	
@@ -49,8 +51,8 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	
 	/******* TRANSFORMATIONS SETTING ******/
 	
-	b.SetTransform(shear_matrix * rotating_matrix);
-	b2.SetTransform(b2_set_pos*shear_matrix_inv);
+	b.SetTransform(b_set_pos * shear_matrix * rotating_matrix);
+	b2.SetTransform(b2_set_pos * shear_matrix_inv);
 	c1.SetTransform(c1_set_pos);
 	plane.SetTransform(plan_set_pos);
 
@@ -61,7 +63,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	plane.Render();
 
 	/******* UPDATING ******/
-	f += (float)dt * 2 * glm::pi<float>() * 0.1f;
+	//f += (float)dt * 2 * glm::pi<float>() * 0.1f;
 }
 
 CoreTP1::~CoreTP1()

@@ -81,7 +81,6 @@ Shape::~Shape()
 Box::Box(vec3 size, vec3 color) : _size(size)
 {
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
-
 	_color = color;
 
 	VertexPositionNormal vertices[36] = {
@@ -177,21 +176,22 @@ Cylinder::Cylinder(double radius, double height, vec3 color): _radius(radius), _
 {
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
-	//Cercle du dessus
+
+	// Top circle
 	VertexPositionNormal vertices[1440];
 	vertices[0] = { vec3(0, _height/2, 0), vec3(0, 1, 0) };
-	for (int i = 1; i < 360; i ++) //<-- Change this Value
+	for (int i = 1; i < 360; i ++)
 	{
 		double theta = 2 * glm::pi<double>() / 360 - i;
-		 vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0, 1, 0) };
-		 vertices[2 * i + 719] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius) };
+		vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0, 1, 0) };
+		vertices[2 * i + 719] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius) };
 	}
-	//Cercle du dessous
+	// Bottom circle
 	vertices[360] = { vec3(0, -(_height / 2), 0), vec3(0, -1, 0) };
-	for (int i = 1; i < 360; i++) //<-- Change this Value
+	for (int i = 1; i < 360; i++)
 	{
 		double theta = 2 * glm::pi<double>() / 360 - i;
-		 vertices[i + 360] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(0, -1, 0) };
+		vertices[i + 360] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(0, -1, 0) };
 		
 		vertices[2 * i + 720] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius) };
 	}
