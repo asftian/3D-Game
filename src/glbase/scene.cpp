@@ -42,12 +42,6 @@ Node* Node::GetParent()
 
 glm::mat4 Node::fullTransform()
 {
-	float shear[16] = {
-		1, 0, 0, 0,
-		-0.2, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1 };
-
 	if (_parent == nullptr)
 		return _transform;
 	else
