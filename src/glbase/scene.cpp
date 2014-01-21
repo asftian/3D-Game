@@ -173,4 +173,61 @@ void Box::Render()
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
+Cylinder::Cylinder(double radius, double height, vec3 color): _radius(radius), _height(height)
+{
+	_vertexBuffer = _indexBuffer = BAD_BUFFER;
+	_color = color;
+	//Cercle du dessus
+	VertexPositionNormal vertices[1440];
+	vertices[0] = { vec3(0, _height/2, 0), vec3(0, 1, 0) };
+	for (int i = 1; i < 360; i ++) //<-- Change this Value
+	{
+		double theta = 2 * glm::pi<double>() / 360 - i;
+		 vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0, 1, 0) };
+		 vertices[2 * i + 719] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius) };
+	}
+	//Cercle du dessous
+	vertices[360] = { vec3(0, -(_height / 2), 0), vec3(0, -1, 0) };
+	for (int i = 1; i < 360; i++) //<-- Change this Value
+	{
+		double theta = 2 * glm::pi<double>() / 360 - i;
+		 vertices[i + 360] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(0, -1, 0) };
+		
+		vertices[2 * i + 720] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius) };
+	}
+	
+
+	// Create Vertex Array Object
+	glGenVertexArrays(1, &_vao);
+	glBindVertexArray(_vao);
+
+	// Generate Vertex Buffer
+	glGenBuffers(1, &_vertexBuffer);
+
+	// Fill Vertex Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Set Vertex Attributes
+	glEnableVertexAttribArray(attribute_position);
+	glVertexAttribPointer(attribute_position, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPositionNormal), (const GLvoid*)0);
+	glEnableVertexAttribArray(attribute_normal);
+	glVertexAttribPointer(attribute_normal, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPositionNormal), (const GLvoid*)(0 + sizeof(vec3)));
+
+	glBindVertexArray(0);
+
+	debugGLError();
+
+}
+void Cylinder::Render()
+{
+	Shape::Render();
+	glBindVertexArray(_vao);
+	glDrawArrays(GL_TRIANGLE_FAN, 0,360);
+	glDrawArrays(GL_TRIANGLE_FAN, 360, 360);
+	glDrawArrays(GL_TRIANGLE_STRIP, 720, 720);
+	
+}
+
+
 #pragma endregion

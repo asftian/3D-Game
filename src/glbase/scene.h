@@ -37,7 +37,7 @@ public:
 	virtual void Render();
 	virtual ~Shape();
 protected:
-	GLuint _vertexBuffer, _indexBuffer, _vao;
+	GLuint _vertexBuffer, _indexBuffer, _vao, _vao2;
 	vec3 _color;
 };
 
@@ -54,11 +54,11 @@ protected:
 class Cylinder : public Shape
 {
 public:
-	Cylinder(float radius, float height, vec3 color);
+	Cylinder(double radius, double height, vec3 color);
 
 	virtual void Render() override;
 protected:
-	float _radius, _height;
+	double _radius, _height;
 };
 class Sphere : public Shape
 {
@@ -66,5 +66,5 @@ public:
 	Sphere(float radius, vec3 color);
 	virtual void Render() override;
 protected:
-	float _radius;
+	double _radius, _height;
 };

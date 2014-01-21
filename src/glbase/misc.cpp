@@ -67,3 +67,4 @@ GLuint loadShader(const char* filename, GLuint shader_type)
 
 	return s;
 }
+

@@ -4,11 +4,13 @@
 CoreTP1::CoreTP1() : Core(),
 b(vec3(1.0, 0.5, 1), vec3(1, 0, 0)),
 b2(vec3(0.3, 0.3, 0.3), vec3(0,0,1)),
+c1(0.2, 0.4, vec3(0,0,1)),
 plane(vec3(4,0.1f,4), vec3(0,1,0)), 
 f(0)
 {
 	/******* BABY MAKING ******/
 	b.AddChild(&b2);
+	//b.AddChild(&c1);
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 
@@ -29,8 +31,10 @@ f(0)
 	shear_matrix = glm::make_mat4(shear);
 	shear_matrix_inv = glm::make_mat4(shearInverted);
 
-	//FLOOR TRANSLATION MATRIX
+	//TRANSLATION MATRIX
 	b2_set_pos = (glm::translate(glm::mat4(), glm::vec3(0, 0.4, 0)));
+	c1_set_pos = (glm::translate(glm::mat4(), glm::vec3(-1.0, 0.0, 0)));
+	plan_set_pos = glm::translate(glm::mat4(), glm::vec3(0, -0.8, 0));
 	
 
 	
@@ -47,9 +51,11 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	
 	b.SetTransform(shear_matrix * rotating_matrix);
 	b2.SetTransform(b2_set_pos*shear_matrix_inv);
-	plane.SetTransform(glm::translate(glm::mat4(), glm::vec3(0, -0.8, 0)));
+	c1.SetTransform(c1_set_pos);
+	plane.SetTransform(plan_set_pos);
 
 	/******* RENDERING ******/
+	c1.Render();
 	b.Render();
 	b2.Render();
 	plane.Render();
