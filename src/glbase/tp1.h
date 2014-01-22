@@ -15,6 +15,8 @@ protected:
 protected:
 	Box body;
 	Box plane;
+	Box scissor1;
+	Box scissor2;
 	Cylinder vertical_tower;
 	Cylinder cannon;
 	Cylinder wheel_fl;
@@ -25,6 +27,12 @@ protected:
 	Cylinder dynamite_fuse;
 	float f;
 	glm::mat4 body_initial_translation;
+	glm::mat4 scissor1_initial_translation;
+	glm::mat4 scissor2_initial_translation;
+	glm::mat4 scissor1_initial_rotation;
+	glm::mat4 scissor2_initial_rotation;
+	glm::mat4 scissor1_initial_shear;
+	glm::mat4 scissor2_initial_shear;
 	glm::mat4 vertical_tower_initial_translation;
 	glm::mat4 cannon_initial_rotation;
 	glm::mat4 cannon_initial_translation;

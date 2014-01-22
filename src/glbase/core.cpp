@@ -138,7 +138,7 @@ void Core::CoreInit()
 	_uniform_projectionMatrix = glGetUniformLocation(_shaderProgram, "projection");
 	_uniform_viewMatrix = glGetUniformLocation(_shaderProgram, "view");
 
-	_projectionMatrix = glm::perspective(glm::pi<float>() / 4.0f, 1.0f, 0.1f, 15.0f);
+	_projectionMatrix = glm::perspective(glm::pi<float>() / 4.0f, 1.0f, 0.01f, 15.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
