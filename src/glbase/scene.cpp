@@ -1,5 +1,6 @@
 #include "scene.h"
 #include <iostream>
+#include <cmath>
 
 #pragma region NODE
 
@@ -43,6 +44,7 @@ Node* Node::GetParent()
 glm::mat4 Node::fullTransform()
 {
 	if (_parent == nullptr)
+		
 		return _transform;
 	else
 		return _parent->fullTransform() * _transform;
@@ -71,13 +73,14 @@ Shape::~Shape()
 #pragma endregion
 
 #pragma region BOX
-
 Box::Box(vec3 size, vec3 color) : _size(size)
-{
+{	
+	
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
 
-	VertexPositionNormal vertices[36] = {
+	VertexPositionNormal vertices[36] =  
+	{
 		{ vec3(0, 0, 0), vec3(0, -1, 0) },
 		{ vec3(1, 0, 0), vec3(0, -1, 0) },
 		{ vec3(0, 0, 1), vec3(0, -1, 0) },
@@ -131,17 +134,36 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 		{ vec3(0, 1, 0), vec3(0, 0, -1) },
 		{ vec3(1, 1, 0), vec3(0, 0, -1) }
 	};
-
-        for (unsigned int x = 0; x < 36; x++)
+	corners = { {
+		vec3(0, 0, 0),
+		vec3(1, 0, 0),
+		vec3(0, 1, 0),
+		vec3(0, 0, 1),
+		vec3(1, 1, 0),
+		vec3(1, 0, 1),
+		vec3(0, 1, 1),
+		vec3(1, 1, 1)
+	} };
+	
+	for (unsigned int x = 0; x < 36; x++){
 		vertices[x].position = (vertices[x].position - 0.5f) * _size;
-
-	// Create Vertex Array Object
+		
+	}
+	for (int x = 0; x < 8; x++){
+		corners[x] = (corners[x] - 0.5f) * _size;
+	}
+	
+	
+	
+	
+	
+	// Create Vertex Array Objects
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
 
 	// Generate Vertex Buffer
 	glGenBuffers(1, &_vertexBuffer);
-
+	
 	// Fill Vertex Buffer
 	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -160,40 +182,44 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 void Box::Render()
 {
 	Shape::Render();
-
+	for (int i = 0; i < 8; i++){
+		glm::vec4 v4(corners[i], 0);
+		v4.p = 1.0;
+		v4 = (_transform*v4);
+		glm::vec3 v3(v4);
+		corners[i] = v3;
+	}
 	glBindVertexArray(_vao);
-	
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+std::array<glm::vec3,8> Box::GetCorners(){
+	return corners;
 }
 
 #pragma endregion
 
 #pragma region CYLINDER
-
 const int Cylinder::slices = 360;
 Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), _height(height)
 {
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
-	
-	
-	VertexPositionNormal vertices[slices*4];
-
+	VertexPositionNormal vertices[slices * 4];
 	// Middle vertex of top circle
-	vertices[0] = { vec3(0, _height/2, 0), vec3(0, 1, 0) };
+	vertices[0] = { vec3(0, _height / 2, 0), vec3(0, 1, 0) };
 	// Middle vertex of bottom circle
 	vertices[slices] = { vec3(0, -(_height / 2), 0), vec3(0, -1, 0) };
 
-	for (int i = 1; i < slices; i ++)
+	for (int i = 1; i < slices; i++)
 	{
 		double theta = 2 * glm::pi<double>() / slices - i;
 		//vertices of top circle
-		vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0,1,0) };
+		vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0, 1, 0) };
 		//vertices of bottom circle
 		vertices[i + slices] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(0, -1, 0) };
 		//vertices of sides
-		vertices[2 * i + slices*2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius))};
-		vertices[2 * i + (slices*2+1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius))};
+		vertices[2 * i + slices * 2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
+		vertices[2 * i + (slices * 2 + 1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 	}
 
 	// Create Vertex Array Object
@@ -205,7 +231,7 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 
 	// Fill Vertex Buffer
 	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
 	// Set Vertex Attributes
 	glEnableVertexAttribArray(attribute_position);
@@ -216,16 +242,29 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 	glBindVertexArray(0);
 
 	debugGLError();
-
 }
 
 void Cylinder::Render()
 {
 	Shape::Render();
-	glBindVertexArray(_vao);
-	glDrawArrays(GL_TRIANGLE_FAN, 0,slices);
-	glDrawArrays(GL_TRIANGLE_FAN, slices, slices);
-	glDrawArrays(GL_TRIANGLE_STRIP, slices*2, slices*2);
 	
+	glBindVertexArray(_vao);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, slices);
+	glDrawArrays(GL_TRIANGLE_FAN, slices, slices);
+	glDrawArrays(GL_TRIANGLE_STRIP, slices * 2, slices * 2);
+	
+
+}
+float* Cylinder::GetXZRadiusHeight(){
+	return 0;
 }
 #pragma endregion
+bool IsThereCollision(Cylinder c, Box b){
+	return false;
+}
+bool IsThereCollision(Cylinder c1, Cylinder c2){
+	return false;
+}
+bool IsFuzeCutByScissors(Cylinder fuse, Box scissorl, Box scissorr){
+	return false;
+}

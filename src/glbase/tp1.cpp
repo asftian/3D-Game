@@ -1,7 +1,7 @@
 #include "tp1.h"
 #include <iostream>
-
-CoreTP1::CoreTP1() :
+static int x = 0;
+CoreTP1::CoreTP1() : Core(),
 body(vec3(1.5, 0.7, 1.0), vec3(0, 217.0 / 255, 38.0 / 255)),
 plane(vec3(8, 0.1, 6), vec3(1.0, 132.0 / 255, 132.0 / 255)),
 scissor1(vec3(0.3, 0.01, 0.045), vec3(0, 0, 1.0)),
@@ -26,12 +26,13 @@ f(0)
 	cannon.AddChild(&scissor1);
 	cannon.AddChild(&scissor2);
 	dynamite_body.AddChild(&dynamite_fuse);
+	std::cout << "in init corner 1 is " << body.GetCorners()[0].x << ", " << body.GetCorners()[0].y << "," << body.GetCorners()[0].z << std::endl;
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 
 	//VIEW MATRIX
 	//vue de l'axe des z
-	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 6), glm::vec3(0, 1.5, 0), glm::vec3(0, 1, 0));
+	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 9), glm::vec3(0, 1.5, 0), glm::vec3(0, 1, 0));
 	//_viewMatrix = glm::lookAt(glm::vec3(0, 2, 4), glm::vec3(0, 2, 0), glm::vec3(0, 1, 0));
 	//vue de l'axe des x
 	//_viewMatrix = glm::lookAt(glm::vec3(6, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
@@ -92,15 +93,19 @@ f(0)
 
 void CoreTP1::Render(double dt) //dt is the time unit
 {
-
+	
+	
 	/******* DYNAMIC MATRIX DEFINITIONS ******/
 	glm::mat4 rotating_matrix = glm::rotate(glm::mat4(), f, glm::normalize(glm::vec3(0.5f, 0.5f, 0.5f)));
+	glm::mat4 dynamite_positioning = glm::translate(glm::mat4(), glm::vec3(f*0.5f, 0.0, 0));
 
 	/******* TRANSFORMATIONS SETTING ******/
 
 	body.SetTransform(
+		dynamite_positioning*
 		body_initial_translation *
 		body_initial_shear
+		
 		);
 
 	vertical_tower.SetTransform(
@@ -178,8 +183,18 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	dynamite_body.Render();
 	dynamite_fuse.Render();
 
+	/*while (x != 2){
 
-	//plane.Render();
+
+		std::cout << "x is " << dynamite_body.GetXZRadiusHeight()[0] << std::endl;
+		std::cout << "z is " << dynamite_body.GetXZRadiusHeight()[1] << std::endl;
+		std::cout << "radius is " << dynamite_body.GetXZRadiusHeight()[2] << std::endl;
+		std::cout << "height is " << dynamite_body.GetXZRadiusHeight()[3] << std::endl;
+		x++;
+	}*/
+	std::cout << "corner 1 is " << body.GetCorners()[0].x << ", " << body.GetCorners()[0].y <<","<< body.GetCorners()[0].z << std::endl;
+
+
 
 	/******* UPDATING ******/
 	f += (float)dt * 2 * glm::pi<float>() * 0.1f;

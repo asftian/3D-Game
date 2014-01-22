@@ -1,6 +1,8 @@
 #pragma once
 
 #include <main.h>
+#include <array>
+#include <algorithm>
 
 using namespace glm;
 
@@ -46,9 +48,12 @@ class Box : public Shape
 public:
 	Box(vec3 size, vec3 color);
 
+	std::array<glm::vec3, 8> GetCorners();
 	virtual void Render() override;
+
 protected:
 	vec3 _size;
+	std::array<glm::vec3,8> corners;
 };	
 
 class Cylinder : public Shape
@@ -56,12 +61,11 @@ class Cylinder : public Shape
 public:
 	static const int slices;
 	Cylinder(double radius, double height, vec3 color);
+	float* GetXZRadiusHeight();
 	
 	virtual void Render() override;
 protected:
 	double _radius, _height;
-	
-	
 };
 class Sphere : public Shape
 {
@@ -71,3 +75,8 @@ public:
 protected:
 	double _radius, _height;
 };
+
+bool IsThereCollision(Cylinder c, Box b);
+
+bool IsThereCollision(Cylinder c1, Cylinder c2);
+bool IsFuzeCutByScissors(Cylinder fuse, Box scissorl, Box scissorr);
