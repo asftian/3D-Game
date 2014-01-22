@@ -25,9 +25,7 @@ protected:
 	Cylinder dynamite_fuse;
 	float f;
 	glm::mat4 body_initial_translation;
-	glm::mat4 inv_body_initial_translation;
 	glm::mat4 vertical_tower_initial_translation;
-	glm::mat4 inv_vertical_tower_initial_translation;
 	glm::mat4 cannon_initial_rotation;
 	glm::mat4 cannon_initial_translation;
 	glm::mat4 wheels_initial_rotation;

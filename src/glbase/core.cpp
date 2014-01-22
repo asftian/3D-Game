@@ -24,11 +24,14 @@ Core::~Core()
 void Core::Run()
 {
 	double time = glfwGetTime();
+	glClearColor(1.0f, 1.0f, 1.0f, 0.5f);
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(_window))
 	{
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 
 		glUseProgram(_shaderProgram);
 
@@ -61,7 +64,7 @@ void Core::GLFWInit()
 	}
 
 	_LOG_INFO() << "GLFW initialized.";
-
+	glfwWindowHint(GLFW_SAMPLES,4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
