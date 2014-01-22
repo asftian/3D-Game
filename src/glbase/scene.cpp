@@ -188,12 +188,12 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 	{
 		double theta = 2 * glm::pi<double>() / slices - i;
 		//vertices of top circle
-		vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0, 1, 0) };
+		vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0,1,0) };
 		//vertices of bottom circle
 		vertices[i + slices] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(0, -1, 0) };
 		//vertices of sides
-		vertices[2 * i + slices*2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius))};
-		vertices[2 * i + (slices*2+1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius))};
+		vertices[2 * i + slices*2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius))};
+		vertices[2 * i + (slices*2+1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius))};
 	}
 
 	// Create Vertex Array Object
