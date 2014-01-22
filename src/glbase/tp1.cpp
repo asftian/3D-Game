@@ -12,8 +12,8 @@ wheel_fl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_fr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_rl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_rr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
-dynamite_body(0.2, 0.6, vec3(1, 0, 0)),
-dynamite_fuse(0.02, 0.3, vec3(1, 1, 1)),
+dynamite_body(0.2, 2.4, vec3(1, 0, 0)),
+dynamite_fuse(0.02, 0.5, vec3(212.0/255, 212.0/255, 212.0/255)),
 f(0)
 {
 	/******* BABY MAKING ******/
@@ -25,6 +25,7 @@ f(0)
 	body.AddChild(&wheel_rr);
 	cannon.AddChild(&scissor1);
 	cannon.AddChild(&scissor2);
+	dynamite_body.AddChild(&dynamite_fuse);
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 
@@ -78,6 +79,8 @@ f(0)
 	wheel_rr_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.7, 0.3, -0.55));
 	scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.3, 0.0, 0.15));
 	scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.3, 0.0, -0.15));
+	dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(2, 0.0,0));
+	dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 1.4,0));
 
 	//ROTATION MATRIX
 	cannon_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 2.0f, glm::vec3(0, 0, 1));
@@ -152,6 +155,12 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		scissor2_initial_rotation*
 		scissor2_initial_shear
 		);
+	dynamite_body.SetTransform(
+		dynamite_body_initial_translation
+		);
+	dynamite_fuse.SetTransform(
+		dynamite_fuse_initial_translation
+		);
 
 	//1.SetTransform(c1_set_pos*rotating_matrix);
 
@@ -166,6 +175,8 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	wheel_rr.Render();
 	scissor1.Render();
 	scissor2.Render();
+	dynamite_body.Render();
+	dynamite_fuse.Render();
 
 
 	//plane.Render();

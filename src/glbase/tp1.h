@@ -43,5 +43,7 @@ protected:
 	glm::mat4 wheel_rr_initial_translation;
 	glm::mat4 body_initial_shear;
 	glm::mat4 children_initial_inverted_shear;
+	glm::mat4 dynamite_body_initial_translation;
+	glm::mat4 dynamite_fuse_initial_translation;
 	std::vector<Node> nodes;
 };
