@@ -54,11 +54,14 @@ protected:
 class Cylinder : public Shape
 {
 public:
+	static const int slices;
 	Cylinder(double radius, double height, vec3 color);
-
+	
 	virtual void Render() override;
 protected:
 	double _radius, _height;
+	
+	
 };
 class Sphere : public Shape
 {

@@ -13,16 +13,29 @@ protected:
 	virtual void Render(double dt) override;
 
 protected:
-	Box b;
-	Box b2;
+	Box body;
 	Box plane;
-	Cylinder c1;
+	Cylinder vertical_tower;
+	Cylinder cannon;
+	Cylinder wheel_fl;
+	Cylinder wheel_fr;
+	Cylinder wheel_rl;
+	Cylinder wheel_rr;
+	Cylinder dynamite_body;
+	Cylinder dynamite_fuse;
 	float f;
-	glm::mat4 b_set_pos;
-	glm::mat4 b2_set_pos;
-	glm::mat4 plan_set_pos;
-	glm::mat4 c1_set_pos;
-	glm::mat4 shear_matrix;
-	glm::mat4 shear_matrix_inv;
+	glm::mat4 body_initial_translation;
+	glm::mat4 inv_body_initial_translation;
+	glm::mat4 vertical_tower_initial_translation;
+	glm::mat4 inv_vertical_tower_initial_translation;
+	glm::mat4 cannon_initial_rotation;
+	glm::mat4 cannon_initial_translation;
+	glm::mat4 wheels_initial_rotation;
+	glm::mat4 wheel_fl_initial_translation;
+	glm::mat4 wheel_fr_initial_translation;
+	glm::mat4 wheel_rl_initial_translation;
+	glm::mat4 wheel_rr_initial_translation;
+	glm::mat4 body_initial_shear;
+	glm::mat4 children_initial_inverted_shear;
 	std::vector<Node> nodes;
 };

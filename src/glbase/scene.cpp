@@ -166,37 +166,35 @@ void Box::Render()
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-Cylinder::Cylinder(double radius, double height, vec3 color): _radius(radius), _height(height)
+#pragma endregion
+
+#pragma region CYLINDER
+
+const int Cylinder::slices = 360;
+Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), _height(height)
 {
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
-
-	VertexPositionNormal vertices[1440];
-
-	// Top circle
-	vertices[0] = { vec3(0, _height/2, 0), vec3(0, 1, 0) };
-	for (int i = 1; i < 360; i ++)
-	{
-		double theta = 2 * glm::pi<double>() / 360 - i;
-		vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0, 1, 0) };
-	}
-
-	// Bottom circle
-	vertices[360] = { vec3(0, -(_height / 2), 0), vec3(0, -1, 0) };
-	for (int i = 1; i < 360; i++)
-	{
-		double theta = 2 * glm::pi<double>() / 360 - i;
-		vertices[i + 360] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(0, -1, 0) };
-	}
-
-	// Sides
-	for (int i = 0; i < 360; i++)
-	{
-		double theta = 2 * glm::pi<double>() / 360 - i;
-		vertices[2*i + 720] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius) };
-		vertices[2*i + 721] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius) };
-	}
 	
+	
+	VertexPositionNormal vertices[slices*4];
+
+	// Middle vertex of top circle
+	vertices[0] = { vec3(0, _height/2, 0), vec3(0, 1, 0) };
+	// Middle vertex of bottom circle
+	vertices[slices] = { vec3(0, -(_height / 2), 0), vec3(0, -1, 0) };
+
+	for (int i = 1; i < slices; i ++)
+	{
+		double theta = 2 * glm::pi<double>() / slices - i;
+		//vertices of top circle
+		vertices[i] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), vec3(0, 1, 0) };
+		//vertices of bottom circle
+		vertices[i + slices] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), vec3(0, -1, 0) };
+		//vertices of sides
+		vertices[2 * i + slices*2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius))};
+		vertices[2 * i + (slices*2+1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius))};
+	}
 
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
@@ -225,9 +223,9 @@ void Cylinder::Render()
 {
 	Shape::Render();
 	glBindVertexArray(_vao);
-	glDrawArrays(GL_TRIANGLE_FAN, 0,360);
-	glDrawArrays(GL_TRIANGLE_FAN, 360, 360);
-	glDrawArrays(GL_TRIANGLE_STRIP, 720, 720);
+	glDrawArrays(GL_TRIANGLE_FAN, 0,slices);
+	glDrawArrays(GL_TRIANGLE_FAN, slices, slices);
+	glDrawArrays(GL_TRIANGLE_STRIP, slices*2, slices*2);
 	
 }
 #pragma endregion
