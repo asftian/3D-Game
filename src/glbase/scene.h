@@ -61,11 +61,12 @@ class Cylinder : public Shape
 public:
 	static const int slices;
 	Cylinder(double radius, double height, vec3 color);
-	float* GetXZRadiusHeight();
+	std::array<float,4> GetXZRadiusHeight();
 	
 	virtual void Render() override;
 protected:
 	double _radius, _height;
+	std::array<glm::vec3, 3> coords;//center-top, center-bottom, side-top
 };
 class Sphere : public Shape
 {

@@ -78,7 +78,7 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 	
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
-
+	std::array<int, 20000> test;
 	VertexPositionNormal vertices[36] =  
 	{
 		{ vec3(0, 0, 0), vec3(0, -1, 0) },
@@ -134,6 +134,7 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 		{ vec3(0, 1, 0), vec3(0, 0, -1) },
 		{ vec3(1, 1, 0), vec3(0, 0, -1) }
 	};
+    
 	corners = { {
 		vec3(0, 0, 0),
 		vec3(1, 0, 0),
@@ -211,6 +212,7 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 	vertices[slices] = { vec3(0, -(_height / 2), 0), vec3(0, -1, 0) };
 
 	for (int i = 1; i < slices; i++)
+
 	{
 		double theta = 2 * glm::pi<double>() / slices - i;
 		//vertices of top circle
@@ -221,6 +223,9 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 		vertices[2 * i + slices * 2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 		vertices[2 * i + (slices * 2 + 1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 	}
+	coords[0] = vertices[0].position;
+	coords[1] = vertices[slices + 1].position;
+	coords[2] = vertices[1].position;
 
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
@@ -247,6 +252,15 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 void Cylinder::Render()
 {
 	Shape::Render();
+	for (int i = 0; i < 3; i++){
+		
+		glm::vec4 v4(coords[i], 0);
+		v4.p = 1.0;
+		v4 = (_transform*v4);
+		glm::vec3 v3(v4);
+		coords[i] = v3;
+		//coords[i] = coords[i] * _transform;
+	}
 	
 	glBindVertexArray(_vao);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, slices);
@@ -255,10 +269,12 @@ void Cylinder::Render()
 	
 
 }
-float* Cylinder::GetXZRadiusHeight(){
-	return 0;
-}
-#pragma endregion
+//std::array<float,4> Cylinder::GetXZRadiusHeight(){
+//	float x = 
+//	return 0;
+//}
+//
+ #pragma endregion
 bool IsThereCollision(Cylinder c, Box b){
 	return false;
 }
