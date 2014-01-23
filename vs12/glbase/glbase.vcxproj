@@ -16,6 +16,7 @@
     <ClInclude Include="..\..\src\glbase\core.h" />
     <ClInclude Include="..\..\src\glbase\scene.h" />
     <ClInclude Include="..\..\src\glbase\tp1.h" />
+    <ClInclude Include="BoundingBox.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\glew\glew.vcxproj">

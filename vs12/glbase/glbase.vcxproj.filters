@@ -30,6 +30,9 @@
     <ClInclude Include="..\..\src\glbase\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BoundingBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\glbase\main.cpp">

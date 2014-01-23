@@ -1,5 +1,6 @@
 #include "tp1.h"
 #include <iostream>
+
 static int x = 0;
 //testtttt
 CoreTP1::CoreTP1() : Core(),
@@ -27,7 +28,7 @@ f(0)
 	cannon.AddChild(&scissor1);
 	cannon.AddChild(&scissor2);
 	dynamite_body.AddChild(&dynamite_fuse);
-	std::cout << "in init corner 1 is " << body.GetCorners()[0].x << ", " << body.GetCorners()[0].y << "," << body.GetCorners()[0].z << std::endl;
+	//std::cout << "in init corner 1 is " << body.GetCorners()[0].x << ", " << body.GetCorners()[0].y << "," << body.GetCorners()[0].z << std::endl;
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 
@@ -193,7 +194,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		std::cout << "height is " << dynamite_body.GetXZRadiusHeight()[3] << std::endl;
 		x++;
 	}*/
-	std::cout << "corner 1 is " << body.GetCorners()[0].x << ", " << body.GetCorners()[0].y <<","<< body.GetCorners()[0].z << std::endl;
+	//std::cout << "corner 1 is " << body.GetCorners()[0].x << ", " << body.GetCorners()[0].y <<","<< body.GetCorners()[0].z << std::endl;
 
 
 

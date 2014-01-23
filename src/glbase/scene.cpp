@@ -1,7 +1,7 @@
 #include "scene.h"
 #include <iostream>
 #include <cmath>
-
+#include "BoundingBox.h"
 #pragma region NODE
 
 GLint Node::uniform_model = -1, Node::uniform_color = -1;
@@ -78,9 +78,8 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 	
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
-	std::array<int, 20000> test;
-	VertexPositionNormal vertices[36] =  
-	{
+	std::array<VertexPositionNormal,36> vertices =  
+	{ {
 		{ vec3(0, 0, 0), vec3(0, -1, 0) },
 		{ vec3(1, 0, 0), vec3(0, -1, 0) },
 		{ vec3(0, 0, 1), vec3(0, -1, 0) },
@@ -133,23 +132,14 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 		{ vec3(1, 0, 0), vec3(0, 0, -1) },
 		{ vec3(0, 1, 0), vec3(0, 0, -1) },
 		{ vec3(1, 1, 0), vec3(0, 0, -1) }
-	};
-    
-	corners = { {
-		vec3(0, 0, 0),
-		vec3(1, 0, 0),
-		vec3(0, 1, 0),
-		vec3(0, 0, 1),
-		vec3(1, 1, 0),
-		vec3(1, 0, 1),
-		vec3(0, 1, 1),
-		vec3(1, 1, 1)
 	} };
+   
 	
 	for (unsigned int x = 0; x < 36; x++){
 		vertices[x].position = (vertices[x].position - 0.5f) * _size;
-		
 	}
+	std::cout<< GetBoundingBox<36>(vertices)[0].x;
+	
 	for (int x = 0; x < 8; x++){
 		corners[x] = (corners[x] - 0.5f) * _size;
 	}
@@ -167,7 +157,7 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 	
 	// Fill Vertex Buffer
 	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
 	// Set Vertex Attributes
 	glEnableVertexAttribArray(attribute_position);
@@ -193,9 +183,7 @@ void Box::Render()
 	glBindVertexArray(_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
-std::array<glm::vec3,8> Box::GetCorners(){
-	return corners;
-}
+
 
 #pragma endregion
 
@@ -275,6 +263,8 @@ void Cylinder::Render()
 //}
 //
  #pragma endregion
+
+
 bool IsThereCollision(Cylinder c, Box b){
 	return false;
 }

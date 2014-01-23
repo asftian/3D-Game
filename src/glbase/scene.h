@@ -3,14 +3,13 @@
 #include <main.h>
 #include <array>
 #include <algorithm>
-
 using namespace glm;
-
 struct VertexPositionNormal
 {
 	vec3 position;
 	vec3 normal;
 };
+
 
 class Node
 {

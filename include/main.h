@@ -42,3 +42,4 @@ void onGLFWError(int code, const char* error);
 void debugGLError();
 GLuint loadShader(const char* filename, GLuint shader_type);
 int **zip(int *arr1, int *arr2, int length);
+
