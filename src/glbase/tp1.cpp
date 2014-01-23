@@ -1,6 +1,7 @@
 #include "tp1.h"
 #include <iostream>
 static int x = 0;
+//git test
 CoreTP1::CoreTP1() : Core(),
 body(vec3(1.5, 0.7, 1.0), vec3(0, 217.0 / 255, 38.0 / 255)),
 plane(vec3(8, 0.1, 6), vec3(1.0, 132.0 / 255, 132.0 / 255)),
