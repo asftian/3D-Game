@@ -31,8 +31,7 @@ protected:
 	glm::mat4 scissor2_initial_translation;
 	glm::mat4 scissor1_initial_rotation;
 	glm::mat4 scissor2_initial_rotation;
-	glm::mat4 scissor1_initial_shear;
-	glm::mat4 scissor2_initial_shear;
+	glm::mat4 scissors_initial_shear;
 	glm::mat4 vertical_tower_initial_translation;
 	glm::mat4 cannon_initial_rotation;
 	glm::mat4 cannon_initial_translation;
