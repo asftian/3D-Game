@@ -14,6 +14,8 @@
     <ClInclude Include="..\..\include\log.h" />
     <ClInclude Include="..\..\include\main.h" />
     <ClInclude Include="..\..\src\glbase\core.h" />
+    <ClInclude Include="..\..\src\glbase\scene.h" />
+    <ClInclude Include="..\..\src\glbase\texture.h" />
     <ClInclude Include="..\..\src\glbase\tp1.h" />
     <ClInclude Include="BoundingBox.h" />
   </ItemGroup>
@@ -31,6 +33,7 @@
     <ClCompile Include="..\..\src\glbase\main.cpp" />
     <ClCompile Include="..\..\src\glbase\misc.cpp" />
     <ClCompile Include="..\..\src\glbase\scene.cpp" />
+    <ClCompile Include="..\..\src\glbase\texture.cpp" />
     <ClCompile Include="..\..\src\glbase\tp1.cpp" />
   </ItemGroup>
   <ItemGroup>

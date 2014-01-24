@@ -43,6 +43,8 @@ public:
 	std::array<vec3,2> GetBoundingBox() const;
 	std::array<vec3, 2> aabbox_coords;
 	std::array<vec3, 8> init_bbox_coords;
+	std::array<vec3, 8> bbox_coords;
+	
 	virtual ~Shape();
 protected:
 	GLuint _vertexBuffer, _indexBuffer, _vao, _vao2;
@@ -82,4 +84,10 @@ protected:
 	double _radius, _height;
 };
 
-bool IsThereCollision(const Shape  &shape1, const Shape &shape2);
+class Collisions{
+public:
+	//Detection par axis aligned bounding boxes
+	static bool AABBDetection(const Shape  &shape1, const Shape &shape2);
+	//Detection par oriented bounding boxes, algorithme SAT (Separating Axis Theorem)
+	static bool OBBDetection(const Shape& shape1, const Shape& shape2);
+};

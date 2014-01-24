@@ -23,6 +23,7 @@
 // SL/STL/C Includes
 #include <climits>
 #include <vector>
+#include <memory>
 #pragma warning(pop)
 
 // Additional Includes
@@ -40,6 +41,5 @@ void deinit();
 // Misc Functions
 void onGLFWError(int code, const char* error);
 void debugGLError();
-GLuint loadShader(const char* filename, GLuint shader_type);
-int **zip(int *arr1, int *arr2, int length);
 
+GLuint loadShader(const char* filename, GLuint shader_type);

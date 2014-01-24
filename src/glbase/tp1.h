@@ -7,12 +7,15 @@ class CoreTP1 : public Core
 {
 public:
 	CoreTP1();
+	
 	virtual ~CoreTP1() override;
+	
 
 protected:
 	virtual void Render(double dt) override;
 
 protected:
+	
 	Box body;
 	Box plane;
 	Box scissor1;
@@ -47,3 +50,4 @@ protected:
 	glm::mat4 dynamite_fuse_initial_translation;
 	std::vector<Node> nodes;
 };
+

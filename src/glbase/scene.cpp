@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include "BoundingBox.h"
+
 #pragma region NODE
  int x = 0;
 GLint Node::uniform_model = -1, Node::uniform_color = -1;
@@ -78,10 +79,11 @@ void Shape::ApplyTransformation(){
 	std::array<vec3, 8> arrayTemp;
 	for (int i = 0; i < 8; i++){
 	    glm::vec4 v4(init_bbox_coords[i], 1);
-	    v4 = (_transform*v4);
+	    v4 = (fullTransform()*v4);
 		vec3 v3(v4);
 		arrayTemp[i] = v3;
-	}
+	}   
+	bbox_coords = arrayTemp;
 	aabbox_coords[1] = GetAABBBFromBB(arrayTemp)[1];
 	aabbox_coords[0] = GetAABBBFromBB(arrayTemp)[0];
 		
@@ -241,7 +243,6 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 		vertices[2 * i + slices * 2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 		vertices[2 * i + (slices * 2 + 1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 	}
-
 }
 
 void Cylinder::Render()
@@ -253,7 +254,7 @@ void Cylinder::Render()
 	glDrawArrays(GL_TRIANGLE_STRIP, slices * 2, slices * 2);
 }
 
- #pragma endregion
+
 
 void Cylinder::Init(const mat4 &mat){
 	for (int i = 0; i < 1440; i++){
@@ -289,14 +290,15 @@ void Cylinder::Init(const mat4 &mat){
 
 	debugGLError();
 }
+#pragma endregion
 
-bool IsThereCollision(const Shape &shape1,const Shape &shape2){
+bool Collisions::AABBDetection(const Shape& shape1,const Shape& shape2){
 	
 	std::array<vec3, 2> b1 = shape1.GetBoundingBox();
 	std::array<vec3, 2> b2 = shape2.GetBoundingBox();
 
-	/*std::cout << "Le point min du body est " << b1[1].y << std::endl;
-	std::cout << "Le point max de la dynamite est " << b2[0].y << std::endl;
+	/*std::cout << "Le point min du cannon est " << b1[1].x << std::endl;
+	std::cout << "Le point max de la fuse est " << b2[0].x << std::endl;
 	std::cout << (b1[0].x > b2[1].x) << std::endl;
 	std::cout << (b1[1].x < b2[0].x) << std::endl;
 	std::cout << (b1[0].y > b2[1].y) << std::endl;
@@ -312,4 +314,13 @@ bool IsThereCollision(const Shape &shape1,const Shape &shape2){
 		b1[1].z < b2[0].z);
 
 }
+bool Collisions::OBBDetection(const Shape& shape1, const Shape& shape2){
+//TODO
+	return false;
+}
 
+std::array<vec3, 15> GetNormalsFromBBs(const std::array<vec3, 8>& bb1, const std::array<vec3, 8>& bb2){
+	std::array<vec3, 15> normals;
+	//TODO
+	return normals;
+}

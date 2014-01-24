@@ -11,6 +11,7 @@
 #endif
 #pragma warning(pop)
 
+bool showLog = true;
 Log::filestream Log::File;
 
 void Log::SetFile(const char* filename)
@@ -39,9 +40,10 @@ Log::~Log()
 #if defined(_MSC_VER) && defined(_DEBUG)
 	OutputDebugString(s.c_str());
 #endif
-
-	std::cerr << s.c_str();
-	std::cerr.flush();
+	if (showLog == true){
+		std::cerr << s.c_str();
+		std::cerr.flush();
+	}
 
 	if (File.good())
 	{
@@ -94,3 +96,4 @@ Log::str Log::GetLevelString(Log::Level level)
 		return "UNKNOWN";
 	}
 }
+

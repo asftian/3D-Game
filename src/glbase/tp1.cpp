@@ -1,8 +1,11 @@
 #include "tp1.h"
 #include <iostream>
 
-static int x = 0;
-CoreTP1::CoreTP1() : Core(),
+
+//NOTE: SI TU VEUX ARRETER LE LOG OUTPUT DANS LA CONSOLE, METS bool showLog a false dans log.cpp (ca fait lagger l'image a cause du output dans la console)
+
+CoreTP1::CoreTP1() :Core(),
+
 body(vec3(1.5, 0.7, 1.0), vec3(0, 217.0 / 255, 38.0 / 255)),
 plane(vec3(8, 0.1, 6), vec3(1.0, 132.0 / 255, 132.0 / 255)),
 scissor1(vec3(0.25, 0.01, 0.065), vec3(0, 0, 1.0)),
@@ -14,8 +17,10 @@ wheel_fr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_rl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_rr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 dynamite_body(0.2, 2.4, vec3(1, 0, 0)),
-dynamite_fuse(0.02, 0.5, vec3(212.0/255, 212.0/255, 212.0/255)),
+dynamite_fuse(0.02, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
 f(0)
+
+
 {
 	//std::cout << dynamite_body._GetBoundingBox()[0].x;
 	/******* BABY MAKING ******/
@@ -32,13 +37,10 @@ f(0)
 	/******* STATIC MATRIX DEFINITIONS ******/
 
 	//VIEW MATRIX
-	//vue de l'axe des z
-	_viewMatrix = glm::lookAt(glm::vec3(3, 4, 8), glm::vec3(0, 1.5, 0), glm::vec3(0, 1, 0));
-	//_viewMatrix = glm::lookAt(glm::vec3(0, 2, 4), glm::vec3(0, 2, 0), glm::vec3(0, 1, 0));
-	//vue de l'axe des x
-	//_viewMatrix = glm::lookAt(glm::vec3(6, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	//vue de l'axe des y
-	//_viewMatrix = glm::lookAt(glm::vec3(0, 14,0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	//Positionnement de la camera.
+	//TODO
+	//En faire une deuxieme pour des points bonis qui sera toggle par une touche du clavier.
+	_viewMatrix = glm::lookAt(glm::vec3(3, 4, 10), glm::vec3(0, 1.5, 0), glm::vec3(0, 1, 0));
 
 	//SHEAR MATRIX
 	float body_shear[16] = {
@@ -47,23 +49,17 @@ f(0)
 		0, 0, 1, 0,
 		0, 0, 0, 1 };
 
-	float scissor1_shear[16] = {
+	float scissors_shear[16] = {
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		-2, 0, 1, 0,
 		0, 0, 0, 1 };
-	float scissor2_shear[16]= {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		2, 0, 1, 0,
-		0, 0, 0, 1 };;
 
 	body_initial_shear = glm::make_mat4(body_shear);
-	scissors_initial_shear = glm::make_mat4(scissor1_shear);
+	scissors_initial_shear = glm::make_mat4(scissors_shear);
 
 	//TRANSLATION MATRIX
 	body_initial_translation = (glm::translate(glm::mat4(), glm::vec3(0, 0.6, 0)));
-
 	vertical_tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.5, 1.2, 0));
 	cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.3, 1.5, 0));
 	cannon_translation = glm::translate(glm::mat4(), glm::vec3(-0.2, 0, 0));
@@ -73,8 +69,8 @@ f(0)
 	wheel_rr_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.65, 0.3, -0.55));
 	scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.5, 0.15));
 	scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.5, -0.15));
-	dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(2.0, 0.0,0));
-	dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 1.5,0));
+	dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(2.0, 0.0, -0.6));
+	dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 1.5, 0));
 
 	//ROTATION MATRIX
 	cannon_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 2.0f, glm::vec3(0, 0, 1));
@@ -82,7 +78,9 @@ f(0)
 	scissor1_initial_rotation = glm::rotate(glm::mat4(), -glm::pi<float>() / 3.0f, glm::vec3(0, 1, 0));
 	scissor2_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 3.0f, glm::vec3(0, 1, 0));
 
-	//Initialisation des formes necessaires afin que les bounding boxes prennent le shear en compte
+	//Initialisation des formes necessaires afin que les transformations initiales en compte.
+	//Par exemple, si on calcule la AABB d'une boite et quon effectue un shear, cette AABB peut
+	//ne plus etre valide. C'est pourquoi avant de passer les vertex au vao, on effectue la transformation.
 	body.Init(
 		body_initial_shear*
 		body_initial_translation
@@ -140,19 +138,19 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	dynamite_body.SetTransform(
 		dynamite_body_initial_translation
 		);
-	cannon.SetTransform(
 
+	//Il faut tjrs commencer par annuler les transformations avant de faire une rotation.
+	//Ici on annule d'abord la translation initiale, on fait l'inverse de la translation de positionnement qui va nous
+	//permettre de faire la rotation a partir de l'extremite, on fait la rotation et finalement on refait les translations.
+	cannon.SetTransform(
 		cannon_initial_translation*
 		cannon_translation*
 		rotating_matrix *
 		glm::inverse(cannon_translation)*
 		glm::inverse(cannon_initial_translation)
-		
-		
-		
 		);
 
-	//1.SetTransform(c1_set_pos*rotating_matrix);
+
 
 	/******* RENDERING ******/
 	body.Render();
@@ -168,12 +166,15 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	dynamite_body.Render();
 	dynamite_fuse.Render();
 
-	if (!IsThereCollision(body, dynamite_body)){
+	if (!Collisions::AABBDetection(body, dynamite_body)){
 		f += (float)dt * 2 * glm::pi<float>() * 0.1f;
 	}
 
 }
 
+
+
 CoreTP1::~CoreTP1()
 {
 }
+
