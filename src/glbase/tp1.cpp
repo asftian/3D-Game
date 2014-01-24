@@ -66,6 +66,7 @@ f(0)
 
 	vertical_tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.5, 1.2, 0));
 	cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.3, 1.5, 0));
+	cannon_translation = glm::translate(glm::mat4(), glm::vec3(-0.2, 0, 0));
 	wheel_fl_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.25, 0.3, -0.55));
 	wheel_fr_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.25, 0.3, 0.55));
 	wheel_rl_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.65, 0.3, 0.55));
@@ -128,7 +129,7 @@ f(0)
 void CoreTP1::Render(double dt) //dt is the time unit
 {
 	/******* DYNAMIC MATRIX DEFINITIONS ******/
-	glm::mat4 rotating_matrix = glm::rotate(glm::mat4(), f, glm::normalize(glm::vec3(0.5f, 0.5f, 0.5f)));
+	glm::mat4 rotating_matrix = glm::rotate(glm::mat4(), f, glm::normalize(glm::vec3(0.0f, 0.5f, 0.0f)));
 	glm::mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(f*0.5f, 0.0, 0));
 
 	/******* TRANSFORMATIONS SETTING ******/
@@ -138,6 +139,17 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		);
 	dynamite_body.SetTransform(
 		dynamite_body_initial_translation
+		);
+	cannon.SetTransform(
+
+		cannon_initial_translation*
+		cannon_translation*
+		rotating_matrix *
+		glm::inverse(cannon_translation)*
+		glm::inverse(cannon_initial_translation)
+		
+		
+		
 		);
 
 	//1.SetTransform(c1_set_pos*rotating_matrix);

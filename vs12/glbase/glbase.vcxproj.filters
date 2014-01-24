@@ -21,9 +21,6 @@
     <ClInclude Include="..\..\src\glbase\tp1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\glbase\scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -67,6 +67,7 @@ void Shape::Render()
 	
 }
 
+
 void Shape::SetAABoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3,2>& coords){
 	coordsToBeSet = coords;
 }
@@ -189,7 +190,7 @@ void Box::Init(const mat4 &mat){
 
 	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
 
-	SetBoundingBox(init_bbox_coords, GetBBFromVertices(aabbox_coords));
+	SetBoundingBox(init_bbox_coords, GetBBFromAABB(aabbox_coords));
 
 	// Create Vertex Array Objects
 	glGenVertexArrays(1, &_vao);
@@ -263,7 +264,7 @@ void Cylinder::Init(const mat4 &mat){
 	}
 	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
 
-	SetBoundingBox(init_bbox_coords, GetBBFromVertices(aabbox_coords));
+	SetBoundingBox(init_bbox_coords, GetBBFromAABB(aabbox_coords));
 
 	 
 

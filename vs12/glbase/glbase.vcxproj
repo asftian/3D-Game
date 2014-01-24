@@ -14,7 +14,6 @@
     <ClInclude Include="..\..\include\log.h" />
     <ClInclude Include="..\..\include\main.h" />
     <ClInclude Include="..\..\src\glbase\core.h" />
-    <ClInclude Include="..\..\src\glbase\scene.h" />
     <ClInclude Include="..\..\src\glbase\tp1.h" />
     <ClInclude Include="BoundingBox.h" />
   </ItemGroup>
