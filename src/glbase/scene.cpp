@@ -56,7 +56,7 @@ glm::mat4 Node::fullTransform()
 #pragma endregion
 
 #pragma region SHAPE
-Shape::Shape() :_coords({ { vec3(0, 0, 0), vec3(0, 0, 0) } }), initial_coords({ { vec3(0, 0, 0), vec3(0, 0, 0) } })
+Shape::Shape() :bbox_coords({ { vec3(0, 0, 0), vec3(0, 0, 0) } }), initial_bbox_coords({ { vec3(0, 0, 0), vec3(0, 0, 0) } })
 {}
 void Shape::Render()
 { 
@@ -72,8 +72,8 @@ void Shape::SetBoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3,2>
 }
 void Shape::ApplyTransformation(){
 
-		glm::vec4 v4_1(_coords[0],1);
-		glm::vec4 v4_2(_coords[1],1);
+		glm::vec4 v4_1(initial_bbox_coords[0],1);
+		glm::vec4 v4_2(initial_bbox_coords[1],1);
 
 		v4_1 = (_transform*v4_1);
 		v4_2 = (_transform*v4_2);
@@ -81,20 +81,13 @@ void Shape::ApplyTransformation(){
 		glm::vec3 v3_1(v4_1);
 		glm::vec3 v3_2(v4_2);
 		
-		this->_coords[0] = v3_1;
-		this->_coords[1] = v3_2;
+		this->bbox_coords[0] = v3_1;
+		this->bbox_coords[1] = v3_2;
 }
 
-std::array<vec3,2> Shape::_GetBoundingBox() const{
-	
-	return _coords;
+std::array<vec3,2> Shape::GetBoundingBox() const{
+	return bbox_coords;
 }
-
-void Shape::Reset_coords(){
-	_coords = initial_coords;
-}
-
-
 
 Shape::~Shape()
 {
@@ -172,27 +165,7 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 	for (unsigned int x = 0; x < 36; x++){
 		vertices[x].position = (vertices[x].position - 0.5f) * _size;
 	}
-	SetBoundingBox(initial_coords, GetBoundingBoxFromVertices(vertices));
-	_coords = initial_coords;
-
-	// Create Vertex Array Object
-	glGenVertexArrays(1, &_vao);
-	glBindVertexArray(_vao);
-
-	// Generate Vertex Buffer
-	glGenBuffers(1, &_vertexBuffer);
-
-	// Fill Vertex Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
-
-	// Set Vertex Attributes
-	glEnableVertexAttribArray(attribute_position);
-	glVertexAttribPointer(attribute_position, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPositionNormal), (const GLvoid*)0);
-	glEnableVertexAttribArray(attribute_normal);
-	glVertexAttribPointer(attribute_normal, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPositionNormal), (const GLvoid*)(0 + sizeof(vec3)));
-
-	glBindVertexArray(0);
+	
 }
 
 void Box::Render()
@@ -205,19 +178,18 @@ void Box::Render()
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-void Box::ReInit(const mat4 &mat){
-	SetTransform(mat);
+void Box::Init(const mat4 &mat){
 	for (int i = 0; i < 36; i++){
 		glm::vec4 v4_1(vertices[i].position, 1);
-		v4_1 = (fullTransform()*v4_1);
+		v4_1 = (mat*v4_1);
 
 		glm::vec3 v3_1(v4_1);
 
 		vertices[i].position = v3_1;
 	}
 
-	SetBoundingBox(initial_coords, GetBoundingBoxFromVertices(vertices));
-	_coords = initial_coords;
+	SetBoundingBox(initial_bbox_coords, GetBoundingBoxFromVertices(vertices));
+	bbox_coords = initial_bbox_coords;
 	// Create Vertex Array Objects
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
@@ -267,35 +239,12 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 		vertices[2 * i + slices * 2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 		vertices[2 * i + (slices * 2 + 1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 	}
-	SetBoundingBox(initial_coords, GetBoundingBoxFromVertices(vertices));
-	_coords = initial_coords;
-
-	// Create Vertex Array Object
-	glGenVertexArrays(1, &_vao);
-	glBindVertexArray(_vao);
-
-	// Generate Vertex Buffer
-	glGenBuffers(1, &_vertexBuffer);
-
-	// Fill Vertex Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
-
-	// Set Vertex Attributes
-	glEnableVertexAttribArray(attribute_position);
-	glVertexAttribPointer(attribute_position, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPositionNormal), (const GLvoid*)0);
-	glEnableVertexAttribArray(attribute_normal);
-	glVertexAttribPointer(attribute_normal, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPositionNormal), (const GLvoid*)(0 + sizeof(vec3)));
-
-	glBindVertexArray(0);
-
 
 }
 
 void Cylinder::Render()
 {
 	Shape::Render();
-	//ApplyTransformation();
 	glBindVertexArray(_vao);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, slices);
 	glDrawArrays(GL_TRIANGLE_FAN, slices, slices);
@@ -304,16 +253,15 @@ void Cylinder::Render()
 
  #pragma endregion
 
-void Cylinder::ReInit(const mat4 &mat){
-	//ApplyTransformation();
+void Cylinder::Init(const mat4 &mat){
 	for (int i = 0; i < 1440; i++){
 		glm::vec4 v4_1(vertices[i].position, 1);
 		v4_1 = (mat*v4_1);
 		glm::vec3 v3_1(v4_1);
 		vertices[i].position = v3_1;
 	}
-	SetBoundingBox(initial_coords, GetBoundingBoxFromVertices(vertices));
-	_coords = initial_coords;
+	SetBoundingBox(initial_bbox_coords, GetBoundingBoxFromVertices(vertices));
+	bbox_coords = initial_bbox_coords;
 
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
@@ -339,8 +287,8 @@ void Cylinder::ReInit(const mat4 &mat){
 
 bool IsThereCollision(const Shape &shape1,const Shape &shape2){
 	
-	std::array<vec3, 2> b1 = shape1._GetBoundingBox();
-	std::array<vec3, 2> b2 = shape2._GetBoundingBox();
+	std::array<vec3, 2> b1 = shape1.GetBoundingBox();
+	std::array<vec3, 2> b2 = shape2.GetBoundingBox();
 	
 	//std::cout << "Le point max du body est " << b1[0].x << std::endl;
 	//std::cout << "Le point min de la dynamite est " << b2[1].x << std::endl;
