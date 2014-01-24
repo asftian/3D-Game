@@ -56,7 +56,7 @@ glm::mat4 Node::fullTransform()
 #pragma endregion
 
 #pragma region SHAPE
-Shape::Shape() :bbox_coords({ { vec3(0, 0, 0), vec3(0, 0, 0) } }), initial_bbox_coords({ { vec3(0, 0, 0), vec3(0, 0, 0) } })
+Shape::Shape()
 {}
 void Shape::Render()
 { 
@@ -67,26 +67,27 @@ void Shape::Render()
 	
 }
 
-void Shape::SetBoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3,2>& coords){
+void Shape::SetAABoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3,2>& coords){
+	coordsToBeSet = coords;
+}
+void Shape::SetBoundingBox(std::array<vec3, 8> &coordsToBeSet, std::array<vec3, 8> &coords){
 	coordsToBeSet = coords;
 }
 void Shape::ApplyTransformation(){
-
-		glm::vec4 v4_1(initial_bbox_coords[0],1);
-		glm::vec4 v4_2(initial_bbox_coords[1],1);
-
-		v4_1 = (_transform*v4_1);
-		v4_2 = (_transform*v4_2);
-
-		glm::vec3 v3_1(v4_1);
-		glm::vec3 v3_2(v4_2);
+	std::array<vec3, 8> arrayTemp;
+	for (int i = 0; i < 8; i++){
+	    glm::vec4 v4(init_bbox_coords[i], 1);
+	    v4 = (_transform*v4);
+		vec3 v3(v4);
+		arrayTemp[i] = v3;
+	}
+	aabbox_coords[1] = GetAABBBFromBB(arrayTemp)[1];
+	aabbox_coords[0] = GetAABBBFromBB(arrayTemp)[0];
 		
-		this->bbox_coords[0] = v3_1;
-		this->bbox_coords[1] = v3_2;
 }
 
 std::array<vec3,2> Shape::GetBoundingBox() const{
-	return bbox_coords;
+	return aabbox_coords;
 }
 
 Shape::~Shape()
@@ -171,9 +172,6 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 void Box::Render()
 {
 	Shape::Render();
-	//perm_vertices = reset_vertices;
-	//ApplyTransformation();
-	
 	glBindVertexArray(_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
@@ -188,8 +186,11 @@ void Box::Init(const mat4 &mat){
 		vertices[i].position = v3_1;
 	}
 
-	SetBoundingBox(initial_bbox_coords, GetBoundingBoxFromVertices(vertices));
-	bbox_coords = initial_bbox_coords;
+
+	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
+
+	SetBoundingBox(init_bbox_coords, GetBBFromVertices(aabbox_coords));
+
 	// Create Vertex Array Objects
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
@@ -260,8 +261,11 @@ void Cylinder::Init(const mat4 &mat){
 		glm::vec3 v3_1(v4_1);
 		vertices[i].position = v3_1;
 	}
-	SetBoundingBox(initial_bbox_coords, GetBoundingBoxFromVertices(vertices));
-	bbox_coords = initial_bbox_coords;
+	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
+
+	SetBoundingBox(init_bbox_coords, GetBBFromVertices(aabbox_coords));
+
+	 
 
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
@@ -289,9 +293,15 @@ bool IsThereCollision(const Shape &shape1,const Shape &shape2){
 	
 	std::array<vec3, 2> b1 = shape1.GetBoundingBox();
 	std::array<vec3, 2> b2 = shape2.GetBoundingBox();
-	
-	//std::cout << "Le point max du body est " << b1[0].x << std::endl;
-	//std::cout << "Le point min de la dynamite est " << b2[1].x << std::endl;
+
+	/*std::cout << "Le point min du body est " << b1[1].y << std::endl;
+	std::cout << "Le point max de la dynamite est " << b2[0].y << std::endl;
+	std::cout << (b1[0].x > b2[1].x) << std::endl;
+	std::cout << (b1[1].x < b2[0].x) << std::endl;
+	std::cout << (b1[0].y > b2[1].y) << std::endl;
+	std::cout << (b1[1].y < b2[0].y) << std::endl;
+	std::cout << (b1[0].z > b2[1].z) << std::endl;
+	std::cout << (b1[1].z < b2[0].z) << "\n\n";*/
 
 	return(b1[0].x > b2[1].x &&
 		b1[1].x < b2[0].x &&

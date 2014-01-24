@@ -36,12 +36,13 @@ class Shape : public Node
 public:
 	Shape();
 	virtual void Render();
-	void SetBoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3, 2> &coords);
+	void SetAABoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3, 2> &coords);
+	void SetBoundingBox(std::array<vec3, 8> &coordsToBeSet, std::array<vec3, 8> &coords);
 	void ApplyTransformation();
 	virtual void Init(const mat4 &transform = mat4())=0;
 	std::array<vec3,2> GetBoundingBox() const;
-	std::array<vec3, 2> bbox_coords;
-	std::array<vec3, 2> initial_bbox_coords;
+	std::array<vec3, 2> aabbox_coords;
+	std::array<vec3, 8> init_bbox_coords;
 	virtual ~Shape();
 protected:
 	GLuint _vertexBuffer, _indexBuffer, _vao, _vao2;

@@ -129,14 +129,12 @@ void CoreTP1::Render(double dt) //dt is the time unit
 {
 	/******* DYNAMIC MATRIX DEFINITIONS ******/
 	glm::mat4 rotating_matrix = glm::rotate(glm::mat4(), f, glm::normalize(glm::vec3(0.5f, 0.5f, 0.5f)));
-	glm::mat4 dynamite_positioning = glm::translate(glm::mat4(), glm::vec3(f*0.5f, 0.0, 0));
+	glm::mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(f*0.5f, 0.0, 0));
 
 	/******* TRANSFORMATIONS SETTING ******/
 
 	body.SetTransform(
-		dynamite_positioning
-		//body_initial_translation
-
+		truck_movement
 		);
 	dynamite_body.SetTransform(
 		dynamite_body_initial_translation
@@ -160,7 +158,8 @@ void CoreTP1::Render(double dt) //dt is the time unit
 
 	if (!IsThereCollision(body, dynamite_body)){
 		f += (float)dt * 2 * glm::pi<float>() * 0.1f;
-	}	
+	}
+
 }
 
 CoreTP1::~CoreTP1()
