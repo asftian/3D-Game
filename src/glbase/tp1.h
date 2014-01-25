@@ -28,6 +28,7 @@ protected:
 	Cylinder wheel_rr;
 	Cylinder dynamite_body;
 	Cylinder dynamite_fuse;
+	Sphere sphere;
 	float f;
 	glm::mat4 body_initial_translation;
 	glm::mat4 scissor1_initial_translation;
@@ -48,6 +49,10 @@ protected:
 	glm::mat4 children_initial_inverted_shear;
 	glm::mat4 dynamite_body_initial_translation;
 	glm::mat4 dynamite_fuse_initial_translation;
+	glm::mat4 sphere_initial_translation;
+	glm::mat4 body_matrix;
+	glm::mat4 wheel_fr_matrix;
 	std::vector<Node> nodes;
+	
 };
 

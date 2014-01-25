@@ -169,27 +169,6 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 	for (unsigned int x = 0; x < 36; x++){
 		vertices[x].position = (vertices[x].position - 0.5f) * _size;
 	}
-	
-}
-
-void Box::Render()
-{
-	Shape::Render();
-	glBindVertexArray(_vao);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-}
-
-void Box::Init(const mat4 &mat){
-	for (int i = 0; i < 36; i++){
-		glm::vec4 v4_1(vertices[i].position, 1);
-		v4_1 = (mat*v4_1);
-
-		glm::vec3 v3_1(v4_1);
-
-		vertices[i].position = v3_1;
-	}
-
-
 	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
 
 	SetBoundingBox(init_bbox_coords, GetBBFromAABB(aabbox_coords));
@@ -214,6 +193,13 @@ void Box::Init(const mat4 &mat){
 	glBindVertexArray(0);
 
 	debugGLError();
+}
+
+void Box::Render()
+{
+	Shape::Render();
+	glBindVertexArray(_vao);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 
@@ -243,31 +229,11 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 		vertices[2 * i + slices * 2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 		vertices[2 * i + (slices * 2 + 1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 	}
-}
-
-void Cylinder::Render()
-{
-	Shape::Render();
-	glBindVertexArray(_vao);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, slices);
-	glDrawArrays(GL_TRIANGLE_FAN, slices, slices);
-	glDrawArrays(GL_TRIANGLE_STRIP, slices * 2, slices * 2);
-}
-
-
-
-void Cylinder::Init(const mat4 &mat){
-	for (int i = 0; i < 1440; i++){
-		glm::vec4 v4_1(vertices[i].position, 1);
-		v4_1 = (mat*v4_1);
-		glm::vec3 v3_1(v4_1);
-		vertices[i].position = v3_1;
-	}
 	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
 
 	SetBoundingBox(init_bbox_coords, GetBBFromAABB(aabbox_coords));
 
-	 
+
 
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
@@ -290,6 +256,16 @@ void Cylinder::Init(const mat4 &mat){
 
 	debugGLError();
 }
+
+void Cylinder::Render()
+{
+	Shape::Render();
+	glBindVertexArray(_vao);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, slices);
+	glDrawArrays(GL_TRIANGLE_FAN, slices, slices);
+	glDrawArrays(GL_TRIANGLE_STRIP, slices * 2, slices * 2);
+}
+
 #pragma endregion
 #pragma region SPHERE
 
@@ -385,7 +361,9 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 	debugGLError();
 
 }
+void Sphere::Init(const mat4& mat){
 
+}
 void Sphere::Render()
 {
 	Shape::Render();

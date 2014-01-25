@@ -39,7 +39,6 @@ public:
 	void SetAABoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3, 2> &coords);
 	void SetBoundingBox(std::array<vec3, 8> &coordsToBeSet, std::array<vec3, 8> &coords);
 	void ApplyTransformation();
-	virtual void Init(const mat4 &transform = mat4())=0;
 	std::array<vec3,2> GetBoundingBox() const;
 	std::array<vec3, 2> aabbox_coords;
 	std::array<vec3, 8> init_bbox_coords;
@@ -55,7 +54,6 @@ class Box : public Shape
 {
 public:
 	Box(vec3 size, vec3 color);
-	void Init(const mat4 &transform = mat4());
 	virtual void Render() override;
 	void setInitialTransformation(mat4 &mat);
 
@@ -70,16 +68,17 @@ public:
 	static const int slices;
 	Cylinder(double radius, double height, vec3 color);
 	virtual void Render() override;
-	void Init(const mat4 &mat = mat4());
 protected:
 	double _radius, _height;
 	std::array<VertexPositionNormal, 1440> vertices;
 };
+
 class Sphere : public Shape
 {
 public:
 	Sphere(double radius, vec3 color);
 	virtual void Render() override;
+	void Init(const mat4 &mat = mat4());
 protected:
 	double _radius, _height;
 };
