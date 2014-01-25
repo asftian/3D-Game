@@ -291,6 +291,109 @@ void Cylinder::Init(const mat4 &mat){
 	debugGLError();
 }
 #pragma endregion
+#pragma region SPHERE
+
+Sphere::Sphere(double radius, vec3 color) : _radius(radius)
+{
+	_vertexBuffer = _indexBuffer = BAD_BUFFER;
+	_color = color;
+
+	const int nStacks = 40;
+	const int nSlices = 40;
+
+	VertexPositionNormal vertices[9360];
+	int n = 0;
+
+	for (int stack = 0; stack < nStacks; stack++)
+	{
+		double theta1 = ((double)(stack) / nStacks) * glm::pi<double>();
+		double theta2 = ((double)(stack + 1) / nStacks) * glm::pi<double>();
+
+		for (int slice = 0; slice < nSlices; slice++)
+		{
+			double phi1 = ((double)(slice) / nSlices) * 2 * glm::pi<double>();
+			double phi2 = ((double)(slice + 1) / nSlices) * 2 * glm::pi<double>();
+
+			// vec3 vertex1 = vec3(_radius*sin(theta1)*cos(phi1), _radius*sin(theta1)*sin(phi1), _radius*cos(theta1));
+			// vec3 vertex2 = vec3(_radius*sin(theta1)*cos(phi2), _radius*sin(theta1)*sin(phi2), _radius*cos(theta1));
+			// vec3 vertex3 = vec3(_radius*sin(theta2)*cos(phi2), _radius*sin(theta2)*sin(phi2), _radius*cos(theta2));
+			// vec3 vertex4 = vec3(_radius*sin(theta2)*cos(phi1), _radius*sin(theta2)*sin(phi1), _radius*cos(theta2));
+
+			if (stack == 0)
+			{
+				vec3 vertex1 = vec3(_radius*glm::sin(theta1)*glm::cos(phi1), _radius*glm::sin(theta1)*glm::sin(phi1), _radius*glm::cos(theta1));
+				vec3 vertex2 = vec3(_radius*glm::sin(theta2)*glm::cos(phi2), _radius*glm::sin(theta2)*glm::sin(phi2), _radius*glm::cos(theta2));
+				vec3 vertex3 = vec3(_radius*glm::sin(theta2)*glm::cos(phi1), _radius*glm::sin(theta2)*glm::sin(phi1), _radius*glm::cos(theta2));
+				vec3 normal = -glm::normalize(glm::cross(vertex2 - vertex1, vertex3 - vertex1));
+				vertices[n] = { vertex1, normal };
+				vertices[n + 1] = { vertex2, normal };
+				vertices[n + 2] = { vertex3, normal };
+				n += 3;
+			}
+			else if (stack + 1 == nStacks)
+			{
+				vec3 vertex1 = vec3(_radius*glm::sin(theta2)*glm::cos(phi2), _radius*glm::sin(theta2)*glm::sin(phi2), _radius*glm::cos(theta2));
+				vec3 vertex2 = vec3(_radius*glm::sin(theta1)*glm::cos(phi1), _radius*glm::sin(theta1)*glm::sin(phi1), _radius*glm::cos(theta1));
+				vec3 vertex3 = vec3(_radius*glm::sin(theta1)*glm::cos(phi2), _radius*glm::sin(theta1)*glm::sin(phi2), _radius*glm::cos(theta1));
+				vec3 normal = -glm::normalize(glm::cross(vertex2 - vertex1, vertex3 - vertex1));
+				vertices[n] = { vertex1, normal };
+				vertices[n + 1] = { vertex2, normal };
+				vertices[n + 2] = { vertex3, normal };
+				n += 3;
+			}
+			else
+			{
+				vec3 vertex1 = vec3(_radius*glm::sin(theta1)*glm::cos(phi1), _radius*glm::sin(theta1)*glm::sin(phi1), _radius*glm::cos(theta1));
+				vec3 vertex2 = vec3(_radius*glm::sin(theta1)*glm::cos(phi2), _radius*glm::sin(theta1)*glm::sin(phi2), _radius*glm::cos(theta1));
+				vec3 vertex3 = vec3(_radius*glm::sin(theta2)*glm::cos(phi1), _radius*glm::sin(theta2)*glm::sin(phi1), _radius*glm::cos(theta2));
+				vec3 normal1 = -glm::normalize(glm::cross(vertex2 - vertex1, vertex3 - vertex1));
+				vertices[n] = { vertex1, normal1 };
+				vertices[n + 1] = { vertex2, normal1 };
+				vertices[n + 2] = { vertex3, normal1 };
+
+				vec3 vertex4 = vec3(_radius*glm::sin(theta1)*glm::cos(phi2), _radius*glm::sin(theta1)*glm::sin(phi2), _radius*glm::cos(theta1));
+				vec3 vertex5 = vec3(_radius*glm::sin(theta2)*glm::cos(phi2), _radius*glm::sin(theta2)*glm::sin(phi2), _radius*glm::cos(theta2));
+				vec3 vertex6 = vec3(_radius*glm::sin(theta2)*glm::cos(phi1), _radius*glm::sin(theta2)*glm::sin(phi1), _radius*glm::cos(theta2));
+				vec3 normal2 = -glm::normalize(glm::cross(vertex2 - vertex1, vertex3 - vertex1));
+				vertices[n + 3] = { vertex4, normal2 };
+				vertices[n + 4] = { vertex5, normal2 };
+				vertices[n + 5] = { vertex6, normal2 };
+				n += 6;
+			}
+		}
+	}
+
+	// Create Vertex Array Object
+	glGenVertexArrays(1, &_vao);
+	glBindVertexArray(_vao);
+
+	// Generate Vertex Buffer
+	glGenBuffers(1, &_vertexBuffer);
+
+	// Fill Vertex Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Set Vertex Attributes
+	glEnableVertexAttribArray(attribute_position);
+	glVertexAttribPointer(attribute_position, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPositionNormal), (const GLvoid*)0);
+	glEnableVertexAttribArray(attribute_normal);
+	glVertexAttribPointer(attribute_normal, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPositionNormal), (const GLvoid*)(0 + sizeof(vec3)));
+
+	glBindVertexArray(0);
+
+	debugGLError();
+
+}
+
+void Sphere::Render()
+{
+	Shape::Render();
+	glBindVertexArray(_vao);
+	glDrawArrays(GL_TRIANGLES, 0, 9360);
+
+}
+#pragma endregion
 
 bool Collisions::AABBDetection(const Shape& shape1,const Shape& shape2){
 	

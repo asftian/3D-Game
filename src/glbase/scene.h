@@ -78,7 +78,7 @@ protected:
 class Sphere : public Shape
 {
 public:
-	Sphere(float radius, vec3 color);
+	Sphere(double radius, vec3 color);
 	virtual void Render() override;
 protected:
 	double _radius, _height;
