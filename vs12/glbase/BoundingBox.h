@@ -1,7 +1,11 @@
-#include "main.h"
+#include <main.h>
 #include <array>
 using namespace glm;
-
+struct VertexPositionNormal
+{
+	vec3 position;
+	vec3 normal;
+};
 
 //Idee empruntee d'un post sur StackOverflow
 //http://stackoverflow.com/questions/9070752/getting-the-bounding-box-of-a-vector-of-points

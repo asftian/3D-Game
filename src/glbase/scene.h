@@ -8,11 +8,7 @@
 #include <cmath>
 
 using namespace glm;
-struct VertexPositionNormal
-{
-	vec3 position;
-	vec3 normal;
-};
+
 
 class Node
 {

@@ -1,5 +1,5 @@
 #include <main.h>
-
+#include "tp1.h"
 int main(int argc, const char* argv[])
 {
 	// First argument is log file, if it exists
