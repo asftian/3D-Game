@@ -1,7 +1,6 @@
 #include "scene.h"
-#include <iostream>
-#include <cmath>
-#include "BoundingBox.h"
+
+
 
 #pragma region NODE
  int x = 0;
@@ -172,6 +171,7 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
 
 	SetBoundingBox(init_bbox_coords, GetBBFromAABB(aabbox_coords));
+	GetNormalsFromBB(init_bbox_coords);
 
 	// Create Vertex Array Objects
 	glGenVertexArrays(1, &_vao);

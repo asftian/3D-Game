@@ -3,6 +3,10 @@
 #include <main.h>
 #include <array>
 #include <algorithm>
+#include "boundingbox.h"
+#include <iostream>
+#include <cmath>
+
 using namespace glm;
 struct VertexPositionNormal
 {

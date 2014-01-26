@@ -11,7 +11,7 @@
 #endif
 #pragma warning(pop)
 
-bool showLog = true;
+bool showLog = false;
 Log::filestream Log::File;
 
 void Log::SetFile(const char* filename)
