@@ -12,8 +12,16 @@ public:
 protected:
 	virtual void Render(double dt) abstract;
 
-	virtual void OnKeyW(bool down) { _LOG_INFO() << "W " << (down ? "down." : "up.") << std::endl; }
-	virtual void OnKeyS(bool down) { _LOG_INFO() << "S " << (down ? "down." : "up.") << std::endl; }
+	float truck_movement_f;
+
+	virtual void OnKeyW(bool down) {
+		truck_movement_f += 0.02;
+		_LOG_INFO() << "W " << (down ? "down." : "up.") << std::endl;
+	}
+	virtual void OnKeyS(bool down) {
+		truck_movement_f -= 0.02;
+		_LOG_INFO() << "S " << (down ? "down." : "up.") << std::endl;
+	}
 	virtual void OnKeyA(bool down) { _LOG_INFO() << "A " << (down ? "down." : "up.") << std::endl; }
 	virtual void OnKeyD(bool down) { _LOG_INFO() << "D " << (down ? "down." : "up.") << std::endl; }
 	virtual void OnKeyR(bool down) { _LOG_INFO() << "R " << (down ? "down." : "up.") << std::endl; }

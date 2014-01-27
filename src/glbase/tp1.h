@@ -28,8 +28,8 @@ protected:
 	Cylinder wheel_rr;
 	Cylinder dynamite_body;
 	Cylinder dynamite_fuse;
-	Sphere sphere;
-	float f;
+	Sphere sphere_tower;
+	Sphere sphere_cannon;
 	glm::mat4 body_initial_translation;
 	glm::mat4 scissor1_initial_translation;
 	glm::mat4 scissor2_initial_translation;
@@ -37,9 +37,11 @@ protected:
 	glm::mat4 scissor2_initial_rotation;
 	glm::mat4 scissors_initial_shear;
 	glm::mat4 vertical_tower_initial_translation;
+	glm::mat4 sphere_tower_initial_translation;
 	glm::mat4 cannon_initial_rotation;
 	glm::mat4 cannon_initial_translation;
 	glm::mat4 cannon_translation;
+	glm::mat4 sphere_cannon_initial_translation;
 	glm::mat4 wheels_initial_rotation;
 	glm::mat4 wheel_fl_initial_translation;
 	glm::mat4 wheel_fr_initial_translation;

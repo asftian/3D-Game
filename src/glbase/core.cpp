@@ -1,7 +1,7 @@
 #include "core.h"
 #include "scene.h"
 
-Core::Core() : _window(nullptr), _textVertexBuffer(BAD_BUFFER), _textUVBuffer(BAD_BUFFER), _attribute_textPosition(4), _attribute_textUV(3)
+Core::Core() : _window(nullptr), _textVertexBuffer(BAD_BUFFER), _textUVBuffer(BAD_BUFFER), _attribute_textPosition(4), _attribute_textUV(3), truck_movement_f(0.0)
 {
 	GLFWInit();
 	GLEWInit();
@@ -332,8 +332,8 @@ void Core::MouseMoveCallback(GLFWwindow* w, double x, double y)
 
 void Core::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods)
 {
-	if (action == GLFW_REPEAT)
-		return;
+	//if (action == GLFW_REPEAT)
+	//	return;
 
 	bool down = action == GLFW_PRESS;
 	switch (key)
