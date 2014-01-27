@@ -282,21 +282,20 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 
 	for (int stack = 0; stack < nStacks; stack++)
 	{
+		// Vertical angle between the stacks
 		double theta1 = ((double)(stack) / nStacks) * glm::pi<double>();
 		double theta2 = ((double)(stack + 1) / nStacks) * glm::pi<double>();
 
 		for (int slice = 0; slice < nSlices; slice++)
 		{
+			// Horizontal angle between the slices
 			double phi1 = ((double)(slice) / nSlices) * 2 * glm::pi<double>();
 			double phi2 = ((double)(slice + 1) / nSlices) * 2 * glm::pi<double>();
 
-			// vec3 vertex1 = vec3(_radius*sin(theta1)*cos(phi1), _radius*sin(theta1)*sin(phi1), _radius*cos(theta1));
-			// vec3 vertex2 = vec3(_radius*sin(theta1)*cos(phi2), _radius*sin(theta1)*sin(phi2), _radius*cos(theta1));
-			// vec3 vertex3 = vec3(_radius*sin(theta2)*cos(phi2), _radius*sin(theta2)*sin(phi2), _radius*cos(theta2));
-			// vec3 vertex4 = vec3(_radius*sin(theta2)*cos(phi1), _radius*sin(theta2)*sin(phi1), _radius*cos(theta2));
-
+			// Top stack
 			if (stack == 0)
 			{
+				// One triangle per slice, connected to the top vertex
 				vec3 vertex1 = vec3(_radius*glm::sin(theta1)*glm::cos(phi1), _radius*glm::sin(theta1)*glm::sin(phi1), _radius*glm::cos(theta1));
 				vec3 vertex2 = vec3(_radius*glm::sin(theta2)*glm::cos(phi2), _radius*glm::sin(theta2)*glm::sin(phi2), _radius*glm::cos(theta2));
 				vec3 vertex3 = vec3(_radius*glm::sin(theta2)*glm::cos(phi1), _radius*glm::sin(theta2)*glm::sin(phi1), _radius*glm::cos(theta2));
@@ -306,8 +305,10 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 				vertices[n + 2] = { vertex3, normal };
 				n += 3;
 			}
+			// Bottom stack
 			else if (stack + 1 == nStacks)
 			{
+				// One triangle per slice, connected to the bottom vertex
 				vec3 vertex1 = vec3(_radius*glm::sin(theta2)*glm::cos(phi2), _radius*glm::sin(theta2)*glm::sin(phi2), _radius*glm::cos(theta2));
 				vec3 vertex2 = vec3(_radius*glm::sin(theta1)*glm::cos(phi1), _radius*glm::sin(theta1)*glm::sin(phi1), _radius*glm::cos(theta1));
 				vec3 vertex3 = vec3(_radius*glm::sin(theta1)*glm::cos(phi2), _radius*glm::sin(theta1)*glm::sin(phi2), _radius*glm::cos(theta1));
@@ -319,6 +320,8 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 			}
 			else
 			{
+				// Two triangles per slice, forming a rectangle
+				// First triangle
 				vec3 vertex1 = vec3(_radius*glm::sin(theta1)*glm::cos(phi1), _radius*glm::sin(theta1)*glm::sin(phi1), _radius*glm::cos(theta1));
 				vec3 vertex2 = vec3(_radius*glm::sin(theta1)*glm::cos(phi2), _radius*glm::sin(theta1)*glm::sin(phi2), _radius*glm::cos(theta1));
 				vec3 vertex3 = vec3(_radius*glm::sin(theta2)*glm::cos(phi1), _radius*glm::sin(theta2)*glm::sin(phi1), _radius*glm::cos(theta2));
@@ -327,6 +330,7 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 				vertices[n + 1] = { vertex2, normal1 };
 				vertices[n + 2] = { vertex3, normal1 };
 
+				// Second triangle
 				vec3 vertex4 = vec3(_radius*glm::sin(theta1)*glm::cos(phi2), _radius*glm::sin(theta1)*glm::sin(phi2), _radius*glm::cos(theta1));
 				vec3 vertex5 = vec3(_radius*glm::sin(theta2)*glm::cos(phi2), _radius*glm::sin(theta2)*glm::sin(phi2), _radius*glm::cos(theta2));
 				vec3 vertex6 = vec3(_radius*glm::sin(theta2)*glm::cos(phi1), _radius*glm::sin(theta2)*glm::sin(phi1), _radius*glm::cos(theta2));
