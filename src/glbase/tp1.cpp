@@ -24,9 +24,10 @@ mat4 wheel_fl_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0
 mat4 wheel_fr_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.3, -0.55));
 mat4 wheel_rl_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.4, 0.3, 0.55));
 mat4 wheel_rr_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.4, 0.3, -0.55));
-mat4 tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 0.6, 0));
-mat4 sphere_tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 1.5, 0));
-mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.5, 0.0));
+mat4 tower_initial_translation1 = glm::translate(glm::mat4(), glm::vec3(0, 0.35, 0));
+mat4 tower_initial_translation2 = glm::translate(glm::mat4(), glm::vec3(0, 0.35, 0));
+mat4 sphere_tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 1.6, 0));
+mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.6, 0.0));
 mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.0, 0.0));
 mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, 0.15));
 mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, -0.15));
@@ -125,13 +126,15 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		);
 
 	tower.SetTransform(
+		tower_initial_translation1*
 		tower_scaling*
-		tower_initial_translation
+		tower_initial_translation2
 		);
 
-	sphere_tower.SetTransform(
+	sphere_tower.SetTransform(	
 		glm::inverse(body_initial_translation)*
-		glm::inverse(tower_initial_translation)*
+		glm::inverse(tower_initial_translation1)*
+		glm::inverse(tower_initial_translation2)*
 		cannon_rotation*
 		sphere_tower_initial_translation*
 		glm::inverse(tower_scaling)
