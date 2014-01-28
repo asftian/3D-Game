@@ -200,7 +200,10 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	/******* CHECKING FOR INPUT ******/
 	//OnKeyW(truck_movement_f += 0.001);
 	if (Collisions::AABBDetection(body, dynamite_body)){
-		movement = false;
+		if (key_pressed = 'w')
+			movement_forward = false;
+		else
+			movement_backward = false;
 	}
 	
 

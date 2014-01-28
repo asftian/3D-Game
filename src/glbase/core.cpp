@@ -5,7 +5,9 @@ Core::Core() : _window(nullptr), _textVertexBuffer(BAD_BUFFER), _textUVBuffer(BA
 {
 	GLFWInit();
 	GLEWInit();
-	movement = true;
+	movement_forward = true;
+	movement_backward = true;
+	key_pressed = 'd'; //default
 	// Clear possible error from GLFW/GLEW initialization
 	glGetError();
 

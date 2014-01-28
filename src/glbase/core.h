@@ -11,18 +11,24 @@ public:
 	
 protected:
 	virtual void Render(double dt) abstract;
-	bool movement;
+	bool movement_forward;
+	bool movement_backward;
+	char key_pressed;
 	float truck_movement_f;
 	virtual void OnKeyW(bool down) {
-		if (movement==true){
-			truck_movement_f += 0.02;
+		key_pressed = 'w';
+		movement_backward = true;
+		if (movement_forward==true){
+			truck_movement_f += 0.04;
 		}
-		_LOG_INFO() << "W " << (down ? "down." : "up.") << std::endl;
+		//_LOG_INFO() << "W " << (down ? "down." : "up.") << std::endl;
 	}
 	virtual void OnKeyS(bool down) {
-		movement = true;
-		truck_movement_f -= 0.02;
-		_LOG_INFO() << "S " << (down ? "down." : "up.") << std::endl;
+		key_pressed = 's';
+		movement_forward = true;
+		if (movement_backward==true)
+			truck_movement_f -= 0.04;
+		//_LOG_INFO() << "S " << (down ? "down." : "up.") << std::endl;
 	}
 	virtual void OnKeyA(bool down) { _LOG_INFO() << "A " << (down ? "down." : "up.") << std::endl; }
 	virtual void OnKeyD(bool down) { _LOG_INFO() << "D " << (down ? "down." : "up.") << std::endl; }
@@ -34,7 +40,7 @@ protected:
 	virtual void OnKeyTAB(bool down) { _LOG_INFO() << "TAB " << (down ? "down." : "up.") << std::endl; }
 	virtual void OnKeySPACE(bool down) { _LOG_INFO() << "SPACE " << (down ? "down." : "up.") << std::endl; }
 
-	virtual void OnMouseMove(float x, float y) { _LOG_INFO() << "Mouse x=" << x << ", y=" << y << std::endl; }
+	virtual void OnMouseMove(float x, float y) { /*_LOG_INFO() << "Mouse x=" << x << ", y=" << y << std::endl;*/ }
 	virtual void OnMouseLeft(bool down) { _LOG_INFO() << "LMB " << (down ? "down." : "up.") << std::endl; }
 	virtual void OnMouseRight(bool down) { _LOG_INFO() << "RMB " << (down ? "down." : "up.") << std::endl; }
 	virtual void OnMouseWheel(double dx, double dy) { _LOG_INFO() << "Wheel dx=" << dx << ", dy=" << dy << std::endl; }
