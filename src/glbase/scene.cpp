@@ -61,35 +61,17 @@ Shape::Shape()
 void Shape::Render()
 { 
 	glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(fullTransform()));
-	ApplyTransformation();
+	if (bb.set!=0){
+		bb.SetTransform(fullTransform());
+	}
+	
 	
 	glUniform3fv(uniform_color, 1, glm::value_ptr(_color));
 	
 }
 
-
-void Shape::SetAABoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3,2>& coords){
-	coordsToBeSet = coords;
-}
-void Shape::SetBoundingBox(std::array<vec3, 8> &coordsToBeSet, std::array<vec3, 8> &coords){
-	coordsToBeSet = coords;
-}
-void Shape::ApplyTransformation(){
-	std::array<vec3, 8> arrayTemp;
-	for (int i = 0; i < 8; i++){
-	    glm::vec4 v4(init_bbox_coords[i], 1);
-	    v4 = (fullTransform()*v4);
-		vec3 v3(v4);
-		arrayTemp[i] = v3;
-	}   
-	bbox_coords = arrayTemp;
-	aabbox_coords[1] = GetAABBBFromBB(arrayTemp)[1];
-	aabbox_coords[0] = GetAABBBFromBB(arrayTemp)[0];
-		
-}
-
-std::array<vec3,2> Shape::GetBoundingBox() const{
-	return aabbox_coords;
+BoundingBox Shape::GetBB() const {
+	return bb;
 }
 
 Shape::~Shape()
@@ -104,7 +86,7 @@ Shape::~Shape()
 #pragma endregion
 
 #pragma region BOX
-Box::Box(vec3 size, vec3 color) : _size(size)
+Box::Box(vec3 size, vec3 color, mat4 init_transf) : _size(size)
 {	
 	
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
@@ -167,11 +149,14 @@ Box::Box(vec3 size, vec3 color) : _size(size)
 	
 	for (unsigned int x = 0; x < 36; x++){
 		vertices[x].position = (vertices[x].position - 0.5f) * _size;
+		glm::vec4 v4(vertices[x].position, 1);
+		v4 = (init_transf*v4);
+		vec3 v3(v4);
+		vertices[x].position = v3;
 	}
-	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
+	bb = BoundingBox(GetAABBFromVertices(vertices));
+	
 
-	SetBoundingBox(init_bbox_coords, GetBBFromAABB(aabbox_coords));
-	GetNormalsFromBB(init_bbox_coords);
 
 	// Create Vertex Array Objects
 	glGenVertexArrays(1, &_vao);
@@ -229,11 +214,8 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 		vertices[2 * i + slices * 2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 		vertices[2 * i + (slices * 2 + 1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 	}
-	SetAABoundingBox(aabbox_coords, GetAABBBFromVertices(vertices));
-
-	SetBoundingBox(init_bbox_coords, GetBBFromAABB(aabbox_coords));
-
-
+	
+	bb = BoundingBox(GetAABBFromVertices(vertices));
 
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
@@ -342,7 +324,6 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 			}
 		}
 	}
-
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
@@ -379,10 +360,10 @@ void Sphere::Render()
 
 bool Collisions::AABBDetection(const Shape& shape1,const Shape& shape2){
 	
-	std::array<vec3, 2> b1 = shape1.GetBoundingBox();
-	std::array<vec3, 2> b2 = shape2.GetBoundingBox();
-
-	/*std::cout << "Le point min du cannon est " << b1[1].x << std::endl;
+	std::array<vec3, 2> b1 = shape1.GetBB().GetAABB();
+	std::array<vec3, 2> b2 = shape2.GetBB().GetAABB();
+	/*
+	std::cout << "Le point min du cannon est " << b1[1].x << std::endl;
 	std::cout << "Le point max de la fuse est " << b2[0].x << std::endl;
 	std::cout << (b1[0].x > b2[1].x) << std::endl;
 	std::cout << (b1[1].x < b2[0].x) << std::endl;
@@ -404,8 +385,3 @@ bool Collisions::OBBDetection(const Shape& shape1, const Shape& shape2){
 	return false;
 }
 
-std::array<vec3, 15> GetNormalsFromBBs(const std::array<vec3, 8>& bb1, const std::array<vec3, 8>& bb2){
-	std::array<vec3, 15> normals;
-	//TODO
-	return normals;
-}

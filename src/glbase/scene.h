@@ -36,27 +36,23 @@ class Shape : public Node
 public:
 	Shape();
 	virtual void Render();
-	void SetAABoundingBox(std::array<vec3,2> &coordsToBeSet, std::array<vec3, 2> &coords);
-	void SetBoundingBox(std::array<vec3, 8> &coordsToBeSet, std::array<vec3, 8> &coords);
-	void ApplyTransformation();
-	std::array<vec3,2> GetBoundingBox() const;
-	std::array<vec3, 2> aabbox_coords;
-	std::array<vec3, 8> init_bbox_coords;
-	std::array<vec3, 8> bbox_coords;
 	
 	virtual ~Shape();
+	BoundingBox GetBB() const;
 protected:
+	
 	GLuint _vertexBuffer, _indexBuffer, _vao, _vao2;
 	vec3 _color;
+	BoundingBox bb;
 };
 
 class Box : public Shape
 {
 public:
-	Box(vec3 size, vec3 color);
+	Box(vec3 size, vec3 color, mat4 init_transf = mat4());
 	virtual void Render() override;
-	void setInitialTransformation(mat4 &mat);
 
+	
 protected:
 	std::array<VertexPositionNormal, 36> vertices;
 	vec3 _size;
@@ -77,6 +73,7 @@ class Sphere : public Shape
 {
 public:
 	Sphere(double radius, vec3 color);
+	
 	virtual void Render() override;
 	void Init(const mat4 &mat = mat4());
 protected:

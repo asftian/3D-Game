@@ -41,9 +41,6 @@
     <None Include="..\..\shaders\fragment.glsl" />
     <None Include="..\..\shaders\vertex.glsl" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\consolas.tga" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{94636AF0-48DA-4B4C-8468-6F1D428C2805}</ProjectGuid>
     <RootNamespace>GLBase</RootNamespace>

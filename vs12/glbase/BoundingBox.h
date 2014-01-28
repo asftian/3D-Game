@@ -14,7 +14,7 @@ struct VertexPositionNormal
 
 //Fonction qui retourne une AABB a partir d'un tableau de vertex
 template<std::size_t SIZE>
-std::array<vec3, 2> GetAABBBFromVertices(const std::array<VertexPositionNormal, SIZE> &arr_of_vec)
+std::array<vec3, 2> GetAABBFromVertices(const std::array<VertexPositionNormal, SIZE> &arr_of_vec)
 {
 	auto resultX = std::minmax_element(arr_of_vec.begin(), arr_of_vec.end(), [](const VertexPositionNormal& lhs, const VertexPositionNormal& rhs) {
 		return lhs.position.x < rhs.position.x;
@@ -32,20 +32,34 @@ std::array<vec3, 2> GetAABBBFromVertices(const std::array<VertexPositionNormal, 
 	return results;
 }
 
-//Pour recalculer la AABB a partir dune Bounding Box a laquelle a ete appliquee la matrice de transformation.
-std::array<vec3, 2> GetAABBBFromBB(const std::array<vec3, 8> &arr_of_vec);
-
-//Fonction qui retourne les 8 coins d'une Bounding Box selon deux points aux extremites
-std::array<vec3, 8> GetBBFromAABB(const std::array<vec3, 2> &arr_of_vec);
-
-std::array<vec3, 3> GetNormalsFromBB(const std::array<vec3, 8>& bounding_box);
-	
-vec3 GetCenterFromBB(const std::array<vec3, 8>& bounding_box);
-
-std::array<vec3, 3> GetExtentsFromBB(const std::array<vec3, 8>& bounding_box);
 
 class BoundingBox{
 public:
+	BoundingBox();
+	//Prend en entree une axis oriented bounding box de 2 points
 	BoundingBox(const std::array<vec3,2>& arr);
-};
+
+	//AABB business
+
+	void setAABB();
+	std::array<vec3, 2> GetAABB() const;
+	//OBB business
+	vec3 GetCenter() const;
+	std::array<vec3, 3> GetExtents() const;
+	std::array<vec3, 3> GetNormals() const;
+	void SetTransform(mat4& mat);
+	int set = 0;
+	virtual ~BoundingBox();
+protected:
+	std::array<vec3, 2> aabb;
+	std::array<vec3, 8> points;
+	std::array<vec3, 8> init_points;
+	std::array<vec3, 3> normals;
+	std::array<vec3, 3> extents;
+	vec3 center;
 	
+	void SetCenter();
+	void SetNormals();
+	void SetExtents();
+	void SetAABB();
+};

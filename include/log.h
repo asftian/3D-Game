@@ -54,7 +54,6 @@ private:
 #define _LOG_INFO() _LOG(Log::INFO)
 #define _LOG_DBG() _LOG(Log::DEBUG)
 
-
 #define _ASSERT_FALSE(action, message) if(!(action)) { _LOG_CRIT() << message; throw exception(); }
 #define _ASSERT_TRUE(action, message) if((action)) { _LOG_CRIT() << message; throw exception(); }
 #define _ASSERT_NZERO(action, message) if((action) != 0) { _LOG_CRIT() << message; throw exception(); }

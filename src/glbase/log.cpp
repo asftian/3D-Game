@@ -11,7 +11,6 @@
 #endif
 #pragma warning(pop)
 
-bool showLog = false;
 Log::filestream Log::File;
 
 void Log::SetFile(const char* filename)
@@ -26,7 +25,7 @@ Log::stream& Log::Get(Log::Level level)
 	char tbuf[80];
 	os << "- " << GetTime(tbuf);
 	os << " " << GetLevelString(level) << ": ";
-	os << str(2*(1 + level), ' ');
+	os << str(2 * (1 + level), ' ');
 	messageLevel = level;
 	return os;
 }
@@ -40,10 +39,9 @@ Log::~Log()
 #if defined(_MSC_VER) && defined(_DEBUG)
 	OutputDebugString(s.c_str());
 #endif
-	if (showLog == true){
-		std::cerr << s.c_str();
-		std::cerr.flush();
-	}
+
+	std::cerr << s.c_str();
+	std::cerr.flush();
 
 	if (File.good())
 	{
@@ -96,4 +94,3 @@ Log::str Log::GetLevelString(Log::Level level)
 		return "UNKNOWN";
 	}
 }
-

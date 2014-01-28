@@ -6,19 +6,21 @@ class Core
 public:
 	Core();
 	virtual ~Core();
-
+	
 	void Run();
-
+	
 protected:
 	virtual void Render(double dt) abstract;
-
+	bool movement;
 	float truck_movement_f;
-
 	virtual void OnKeyW(bool down) {
-		truck_movement_f += 0.02;
+		if (movement==true){
+			truck_movement_f += 0.02;
+		}
 		_LOG_INFO() << "W " << (down ? "down." : "up.") << std::endl;
 	}
 	virtual void OnKeyS(bool down) {
+		movement = true;
 		truck_movement_f -= 0.02;
 		_LOG_INFO() << "S " << (down ? "down." : "up.") << std::endl;
 	}

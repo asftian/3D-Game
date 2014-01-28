@@ -5,7 +5,7 @@ Core::Core() : _window(nullptr), _textVertexBuffer(BAD_BUFFER), _textUVBuffer(BA
 {
 	GLFWInit();
 	GLEWInit();
-
+	movement = true;
 	// Clear possible error from GLFW/GLEW initialization
 	glGetError();
 
@@ -332,8 +332,8 @@ void Core::MouseMoveCallback(GLFWwindow* w, double x, double y)
 
 void Core::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods)
 {
-	//if (action == GLFW_REPEAT)
-	//	return;
+	/*if (action == GLFW_REPEAT)
+		return;*/
 
 	bool down = action == GLFW_PRESS;
 	switch (key)

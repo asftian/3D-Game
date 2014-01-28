@@ -28,6 +28,7 @@
 
 // Additional Includes
 #include <log.h>
+#include <iostream>
 
 // Utility Defines
 #define abstract = 0
@@ -41,5 +42,4 @@ void deinit();
 // Misc Functions
 void onGLFWError(int code, const char* error);
 void debugGLError();
-
 GLuint loadShader(const char* filename, GLuint shader_type);
