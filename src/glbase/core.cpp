@@ -1,7 +1,23 @@
 #include "core.h"
 #include "scene.h"
 
-Core::Core() : _window(nullptr), _textVertexBuffer(BAD_BUFFER), _textUVBuffer(BAD_BUFFER), _attribute_textPosition(4), _attribute_textUV(3), truck_movement_f(0.0)
+Core::Core() :
+_window(nullptr),
+_textVertexBuffer(BAD_BUFFER),
+_textUVBuffer(BAD_BUFFER),
+_attribute_textPosition(4),
+_attribute_textUV(3),
+truck_movement_f(0.0),
+movement_forward(0),
+movement_backward(0),
+cannon_rotation_f(0.0),
+rotation_counter_clockwise(0),
+rotation_clockwise(0),
+cannon_scaling_f(1.0),
+cannon_scaling_up(0),
+cannon_scaling_down(0),
+scissors_rotation_f(0.0),
+scissors_closed(0)
 {
 	GLFWInit();
 	GLEWInit();

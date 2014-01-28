@@ -11,28 +11,24 @@ public:
 	
 	virtual ~CoreTP1() override;
 
-
 protected:
 	virtual void Render(double dt) override;
 
-	Box body;
 	Box plane;
-	Box scissor1;
-	Box scissor2;
-	Cylinder vertical_tower;
-	Cylinder cannon;
+	Box body;
 	Cylinder wheel_fl;
 	Cylinder wheel_fr;
 	Cylinder wheel_rl;
 	Cylinder wheel_rr;
-	Cylinder dynamite_body;
-	Cylinder dynamite_fuse;
+	Cylinder vertical_tower;
 	Sphere sphere_tower;
+	Cylinder cannon;
 	Sphere sphere_cannon;
-	
+	Box scissor1;
+	Box scissor2;	
+	Cylinder dynamite_body;
+	Cylinder dynamite_fuse;	
 
-	std::vector<Node> nodes;
-
-	
+	std::vector<Node> nodes;	
 };
 

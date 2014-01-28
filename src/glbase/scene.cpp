@@ -1,7 +1,5 @@
 #include "scene.h"
 
-
-
 #pragma region NODE
  int x = 0;
 GLint Node::uniform_model = -1, Node::uniform_color = -1;
@@ -324,6 +322,7 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 			}
 		}
 	}
+
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
