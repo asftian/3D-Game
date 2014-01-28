@@ -16,6 +16,9 @@ rotation_clockwise(0),
 cannon_scaling_f(1.0),
 cannon_scaling_up(0),
 cannon_scaling_down(0),
+tower_scaling_f(1.0),
+tower_scaling_up(0),
+tower_scaling_down(0),
 scissors_rotation_f(0.0),
 scissors_closed(0)
 {

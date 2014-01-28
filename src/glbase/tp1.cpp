@@ -24,7 +24,7 @@ mat4 wheel_fl_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0
 mat4 wheel_fr_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.3, -0.55));
 mat4 wheel_rl_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.4, 0.3, 0.55));
 mat4 wheel_rr_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.4, 0.3, -0.55));
-mat4 vertical_tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 0.6, 0));
+mat4 tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 0.6, 0));
 mat4 sphere_tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 1.5, 0));
 mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.5, 0.0));
 mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.0, 0.0));
@@ -47,7 +47,7 @@ wheel_fl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_fr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_rl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_rr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
-vertical_tower(0.08, 0.7, vec3(1.0, 164.0 / 255, 1.0)),
+tower(0.08, 0.7, vec3(1.0, 164.0 / 255, 1.0)),
 sphere_tower(0.14, vec3(1.0, 164.0 / 255, 1.0)),
 cannon(0.05, 1.0, vec3(1.0, 164.0 / 255, 1.0)),
 sphere_cannon(0.05, vec3(1.0, 164.0 / 255, 1.0)),
@@ -63,8 +63,8 @@ Core()
 	body.AddChild(&wheel_fr);
 	body.AddChild(&wheel_rl);
 	body.AddChild(&wheel_rr);
-	body.AddChild(&vertical_tower);
-	vertical_tower.AddChild(&sphere_tower);
+	body.AddChild(&tower);
+	tower.AddChild(&sphere_tower);
 	sphere_tower.AddChild(&cannon);
 	cannon.AddChild(&sphere_cannon);
 	sphere_cannon.AddChild(&scissor1);
@@ -88,6 +88,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
 	mat4 cannon_rotation = glm::rotate(glm::mat4(), cannon_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 	mat4 cannon_scaling = glm::scale(glm::mat4(), glm::vec3(cannon_scaling_f, 1.0, 1.0));
+	mat4 tower_scaling = glm::scale(glm::mat4(), glm::vec3(1.0, tower_scaling_f, 1.0));
 	mat4 scissor1_rotation = glm::rotate(glm::mat4(), scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 	mat4 scissor2_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 
@@ -123,15 +124,17 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		wheels_initial_rotation
 		);
 
-	vertical_tower.SetTransform(
-		vertical_tower_initial_translation
+	tower.SetTransform(
+		tower_scaling*
+		tower_initial_translation
 		);
 
 	sphere_tower.SetTransform(
 		glm::inverse(body_initial_translation)*
-		glm::inverse(vertical_tower_initial_translation)*
+		glm::inverse(tower_initial_translation)*
 		cannon_rotation*
-		sphere_tower_initial_translation
+		sphere_tower_initial_translation*
+		glm::inverse(tower_scaling)
 		);
 
 	cannon.SetTransform(
@@ -143,8 +146,8 @@ void CoreTP1::Render(double dt) //dt is the time unit
 
 	sphere_cannon.SetTransform(
 		glm::inverse(cannon_initial_rotation)*
-		//glm::inverse(cannon_scaling)*
-		sphere_cannon_initial_translation
+		sphere_cannon_initial_translation*
+		glm::inverse(cannon_scaling)
 		);
 
 	scissor1.SetTransform(
@@ -175,7 +178,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	wheel_fr.Render();
 	wheel_rl.Render();
 	wheel_rr.Render();
-	vertical_tower.Render();
+	tower.Render();
 	sphere_tower.Render();
 	cannon.Render();
 	sphere_cannon.Render();
@@ -192,6 +195,13 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		else
 			movement_backward = false;
 	}
+
+	/*if (Collisions::AABBDetection(cannon, dynamite_body)){
+		if (key_pressed = 'a')
+			rotation_counter_clockwise = false;
+		else
+			rotation_clockwise = false;
+	}*/
 }
 
 CoreTP1::~CoreTP1()

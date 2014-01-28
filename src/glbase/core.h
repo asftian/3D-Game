@@ -21,6 +21,9 @@ protected:
 	float cannon_scaling_f;
 	bool cannon_scaling_up;
 	bool cannon_scaling_down;
+	float tower_scaling_f;
+	bool tower_scaling_up;
+	bool tower_scaling_down;
 	float scissors_rotation_f;
 	bool scissors_closed;
 
@@ -68,14 +71,30 @@ protected:
 		key_pressed = 'f';
 		cannon_scaling_down = true;
 		if (cannon_scaling_down == true){
-			if (cannon_scaling_f > 0.05)
+			if (cannon_scaling_f > 0.15)
 				cannon_scaling_f -= 0.05;
 		}
 		//_LOG_INFO() << "F " << (down ? "down." : "up.") << std::endl;
 	}
 
-	virtual void OnKeyQ(bool down) { _LOG_INFO() << "Q " << (down ? "down." : "up.") << std::endl; }
-	virtual void OnKeyE(bool down) { _LOG_INFO() << "E " << (down ? "down." : "up.") << std::endl; }
+	virtual void OnKeyQ(bool down) {
+		key_pressed = 'q';
+		tower_scaling_down = true;
+		if (tower_scaling_down == true){
+			if (tower_scaling_f > 0.15)
+				tower_scaling_f -= 0.05;
+		}
+		//_LOG_INFO() << "Q " << (down ? "down." : "up.") << std::endl;
+	}
+
+	virtual void OnKeyE(bool down) {
+		key_pressed = 'e';
+		tower_scaling_up = true;
+		if (tower_scaling_up == true)
+			tower_scaling_f += 0.05;
+		//_LOG_INFO() << "E " << (down ? "down." : "up.") << std::endl;
+	}
+
 	virtual void OnKeyTAB(bool down) { _LOG_INFO() << "TAB " << (down ? "down." : "up.") << std::endl; }
 
 	virtual void OnKeySPACE(bool down) {

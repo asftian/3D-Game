@@ -20,7 +20,7 @@ protected:
 	Cylinder wheel_fr;
 	Cylinder wheel_rl;
 	Cylinder wheel_rr;
-	Cylinder vertical_tower;
+	Cylinder tower;
 	Sphere sphere_tower;
 	Cylinder cannon;
 	Sphere sphere_cannon;
