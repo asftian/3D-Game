@@ -59,12 +59,7 @@ Shape::Shape()
 void Shape::Render()
 {
 	glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(fullTransform()));
-	
 	bb.SetTransform(fullTransform());
-	
-	
-
-
 	glUniform3fv(uniform_color, 1, glm::value_ptr(_color));
 
 }

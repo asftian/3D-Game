@@ -96,8 +96,10 @@ void BoundingBox::SetExtents(){
 void BoundingBox::print(std::string name){
 	std::cout << name << std::endl;
 	std::cout << "center is " << c.x << "," << c.y << "," << c.z << "\n";
-	std::cout << "normals are \n" << u[0].x << "," << u[0].y << "," << u[0].z << "\n" << u[1].x << "," << u[1].y << "," << u[1].z << "\n" << u[2].x << "," << u[2].y << "," << u[2].z << "\n";
-	bool test = false;
+	std::cout << "normals are \n" << 
+		u[0].x << "," << u[0].y << "," << u[0].z <<"\n" << 
+		u[1].x << "," << u[1].y << "," << u[1].z <<"\n" <<
+		u[2].x << "," << u[2].y << "," << u[2].z <<"\n";
 	float scal = dot(u[0], u[1]);
 	std::cout << "first dot product " << scal << "\n";
 

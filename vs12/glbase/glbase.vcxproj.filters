@@ -39,7 +39,7 @@
     <ClInclude Include="collisions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="structs.h">
+    <ClInclude Include="vertexpositionnormal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

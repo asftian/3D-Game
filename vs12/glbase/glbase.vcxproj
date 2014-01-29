@@ -19,7 +19,7 @@
     <ClInclude Include="..\..\src\glbase\tp1.h" />
     <ClInclude Include="boundingbox.h" />
     <ClInclude Include="collisions.h" />
-    <ClInclude Include="structs.h" />
+    <ClInclude Include="vertexpositionnormal.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\glew\glew.vcxproj">
