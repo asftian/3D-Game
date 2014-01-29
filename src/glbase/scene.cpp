@@ -1,7 +1,7 @@
 #include "scene.h"
 
 #pragma region NODE
- int x = 0;
+int x = 0;
 GLint Node::uniform_model = -1, Node::uniform_color = -1;
 GLint Node::attribute_position = 1, Node::attribute_normal = 2;
 
@@ -18,9 +18,9 @@ void Node::InitializePostLink(GLuint program)
 }
 
 Node::Node()
-	: _transform(), _children(), _parent(nullptr)
+: _transform(), _children(), _parent(nullptr)
 {
-	
+
 }
 
 void Node::SetTransform(const mat4 &transform)
@@ -44,7 +44,7 @@ Node* Node::GetParent()
 glm::mat4 Node::fullTransform()
 {
 	if (_parent == nullptr)
-		
+
 		return _transform;
 	else
 		return _parent->fullTransform() * _transform;
@@ -57,15 +57,16 @@ glm::mat4 Node::fullTransform()
 Shape::Shape()
 {}
 void Shape::Render()
-{ 
+{
 	glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(fullTransform()));
-	if (bb.set!=0){
-		bb.SetTransform(fullTransform());
-	}
+	
+	bb.SetTransform(fullTransform());
 	
 	
+
+
 	glUniform3fv(uniform_color, 1, glm::value_ptr(_color));
-	
+
 }
 
 BoundingBox Shape::GetBB() const {
@@ -85,11 +86,11 @@ Shape::~Shape()
 
 #pragma region BOX
 Box::Box(vec3 size, vec3 color, mat4 init_transf) : _size(size)
-{	
-	
+{
+
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
-	 vertices =  
+	vertices =
 	{ {
 		{ vec3(0, 0, 0), vec3(0, -1, 0) },
 		{ vec3(1, 0, 0), vec3(0, -1, 0) },
@@ -144,7 +145,7 @@ Box::Box(vec3 size, vec3 color, mat4 init_transf) : _size(size)
 		{ vec3(0, 1, 0), vec3(0, 0, -1) },
 		{ vec3(1, 1, 0), vec3(0, 0, -1) }
 	} };
-	
+
 	for (unsigned int x = 0; x < 36; x++){
 		vertices[x].position = (vertices[x].position - 0.5f) * _size;
 		glm::vec4 v4(vertices[x].position, 1);
@@ -153,7 +154,7 @@ Box::Box(vec3 size, vec3 color, mat4 init_transf) : _size(size)
 		vertices[x].position = v3;
 	}
 	bb = BoundingBox(GetAABBFromVertices(vertices));
-	
+
 
 
 	// Create Vertex Array Objects
@@ -181,6 +182,7 @@ Box::Box(vec3 size, vec3 color, mat4 init_transf) : _size(size)
 void Box::Render()
 {
 	Shape::Render();
+	
 	glBindVertexArray(_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
@@ -190,11 +192,11 @@ void Box::Render()
 
 #pragma region CYLINDER
 const int Cylinder::slices = 360;
-Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), _height(height)
+Cylinder::Cylinder(double radius, double height, vec3 color, mat4& init_transf) : _radius(radius), _height(height)
 {
 	_vertexBuffer = _indexBuffer = BAD_BUFFER;
 	_color = color;
-	
+
 	// Middle vertex of top circle
 	vertices[0] = { vec3(0, _height / 2, 0), vec3(0, 1, 0) };
 	// Middle vertex of bottom circle
@@ -212,7 +214,17 @@ Cylinder::Cylinder(double radius, double height, vec3 color) : _radius(radius), 
 		vertices[2 * i + slices * 2] = { vec3(sin(theta)*_radius, _height / 2, cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 		vertices[2 * i + (slices * 2 + 1)] = { vec3(sin(theta)*_radius, -(_height / 2), cos(theta)*_radius), glm::normalize(vec3(sin(theta)*_radius, 0, cos(theta)*_radius)) };
 	}
-	
+	for (unsigned int x = 0; x < 1440; x++){
+		glm::vec4 v4(vertices[x].position, 1);
+		glm::vec4 v4n(vertices[x].normal, 1);
+		v4 = (init_transf*v4);
+		v4n = (init_transf*v4n);
+		vec3 v3(v4);
+		vec3 v3n(v4n);
+		vertices[x].position = v3;
+		vertices[x].normal = v3n;
+	}
+
 	bb = BoundingBox(GetAABBFromVertices(vertices));
 
 	// Create Vertex Array Object
@@ -257,7 +269,7 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 	const int nStacks = 40;
 	const int nSlices = 40;
 
-	VertexPositionNormal vertices[9360];
+	std::array<VertexPositionNormal,9360> vertices;
 	int n = 0;
 
 	for (int stack = 0; stack < nStacks; stack++)
@@ -322,7 +334,8 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 			}
 		}
 	}
-
+	
+	bb = BoundingBox(GetAABBFromVertices(vertices));
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
@@ -332,7 +345,7 @@ Sphere::Sphere(double radius, vec3 color) : _radius(radius)
 
 	// Fill Vertex Buffer
 	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
 	// Set Vertex Attributes
 	glEnableVertexAttribArray(attribute_position);
@@ -357,8 +370,8 @@ void Sphere::Render()
 }
 #pragma endregion
 
-bool Collisions::AABBDetection(const Shape& shape1,const Shape& shape2){
-	
+bool Collisions::AABBDetection(const Shape& shape1, const Shape& shape2){
+
 	std::array<vec3, 2> b1 = shape1.GetBB().GetAABB();
 	std::array<vec3, 2> b2 = shape2.GetBB().GetAABB();
 	/*
@@ -380,7 +393,113 @@ bool Collisions::AABBDetection(const Shape& shape1,const Shape& shape2){
 
 }
 bool Collisions::OBBDetection(const Shape& shape1, const Shape& shape2){
-//TODO
-	return false;
+	//TODO
+	BoundingBox& A = shape1.GetBB();
+	BoundingBox& B = shape2.GetBB();
+	
+	vec3 D = B.GetCenter() - A.GetCenter();
+
+	float a0 = A.GetExtents().at(0);
+	float a1 = A.GetExtents().at(1);
+	float a2 = A.GetExtents().at(2);
+
+	vec3 A0 = A.GetNormals().at(0);
+	vec3 A1 = A.GetNormals().at(1);
+	vec3 A2 = A.GetNormals().at(2);
+
+	float b0 = B.GetExtents().at(0); 
+	float b1 = B.GetExtents().at(1);
+	float b2 = B.GetExtents().at(2);
+
+	vec3 B0 = B.GetNormals().at(0);
+	vec3 B1 = B.GetNormals().at(1);
+	vec3 B2 = B.GetNormals().at(2);
+	
+	float c00 = dot(A.GetNormals().at(0), B.GetNormals().at(0));
+	float c01 = dot(A.GetNormals().at(0), B.GetNormals().at(1));
+	float c02 = dot(A.GetNormals().at(0), B.GetNormals().at(2));
+	float c10 = dot(A.GetNormals().at(1), B.GetNormals().at(0));
+	float c11 = dot(A.GetNormals().at(1), B.GetNormals().at(1));
+	float c12 = dot(A.GetNormals().at(1), B.GetNormals().at(2));
+	float c20 = dot(A.GetNormals().at(2), B.GetNormals().at(0));
+	float c21 = dot(A.GetNormals().at(2), B.GetNormals().at(1));
+	float c22 = dot(A.GetNormals().at(2), B.GetNormals().at(2));
+
+	//A0
+	float R0 = a0;
+	float R1 = b0*abs(c00) + b1*abs(c01) + b2*abs(c02);
+	float R = abs(dot(A0, D));
+	if (R > (R0 + R1)) return false;
+	//A1
+	R0 = a1;
+	R1 = b0*abs(c10) + b1*abs(c11) + b2*abs(c12);
+	R = abs(dot(A1, D));
+	if (R > (R0 + R1)) return false;
+	//A2
+	R0 = a2;
+	R1 = b0*abs(c20) + b1*abs(c21) + b2*abs(c22);
+	R = abs(dot(A2, D));
+	if (R > (R0 + R1)) return false;
+	//B0
+	R0 = a0*abs(c00) + a1*abs(c10) + a2*abs(c20);
+	R1 = b0;
+	R = abs(dot(B0, D));
+	if (R > (R0 + R1)) return false;
+	//B1
+	R0 = a0*abs(c01) + a1*abs(c11) + a2*abs(c21);
+	R1 = b1;
+	R = abs(dot(B1, D));
+	if (R > (R0 + R1)) return false;
+	//B2
+	R0 = a0*abs(c02) + a1*abs(c12) + a2*abs(c22);
+	R1 = b2;
+	R = abs(dot(B2, D));
+	if (R > (R0 + R1)) return false;
+	//A0 x B0
+	R0 = a1 * abs(c20) + a2 * abs(c10);
+	R1 = b1*abs(c02) + b2*abs(c01);
+	R = abs(dot(c10*A2, D) - dot(c20*A1, D));
+	if (R > (R0 + R1)) return false;
+	//A0 x B1
+	R0 = a1 * abs(c21) + a2 * abs(c11);
+	R1 = b0*abs(c02) + b2*abs(c00);
+	R = abs(dot(c11*A2, D) - dot(c21*A1, D));
+	if (R > (R0 + R1)) return false;
+	//A0 x B2
+	R0 = a1 * abs(c22) + a2 * abs(c12);
+	R1 = b0*abs(c01) + b1*abs(c00);
+	R = abs(dot(c12*A2, D) - dot(c22*A1, D));
+	if (R > (R0 + R1)) return false;
+	//A1 x B0
+	R0 = a0 * c20 + a2 * c00;
+	R1 = b1*abs(c12) + b2*abs(c11);
+	R = abs(dot(c20*A0, D) - dot(c00*A2, D));
+	if (R > (R0 + R1)) return false;
+	//A1 x B1
+	R0 = a0 * abs(c21) + a2 * abs(c01);
+	R1 = b0*abs(c12) + b2*abs(c10);
+	R = abs(dot(c21*A0, D) - dot(c01*A2, D));
+	if (R > (R0 + R1)) return false;
+	//A1 x B2
+	R0 = a0 * abs(c22) + a2 * abs(c02);
+	R1 = b0*abs(c11) + b1*abs(c10);
+	R = abs(dot(c22*A0, D) - dot(c02*A2, D));
+	if (R > (R0 + R1)) return false;
+	//A2 x B0
+	R0 = a0 * abs(c10) + a1 * abs(c00);
+	R1 = b1*abs(c22) + b2*abs(c21);
+	R = abs(dot(c00*A1, D) - dot(c10*A0, D));
+	if (R > (R0 + R1)) return false;
+	//A2 x B1
+	R0 = a0 * abs(c11) + a1 * abs(c01);
+	R1 = b0*abs(c22) + b2*abs(c20);
+	R = abs(dot(c01*A1, D) - dot(c11*A0, D));
+	if (R > (R0 + R1)) return false;
+	//A2 x B2
+	R0 = a0 * abs(c12) + a1 * abs(c02);
+	R1 = b0*abs(c21) + b1*abs(c20);
+	R = abs(dot(c02*A1, D) - dot(c12*A0, D));
+	if (R > (R0 + R1)) return false;
+	return true;
 }
 

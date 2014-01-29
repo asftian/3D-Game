@@ -29,7 +29,7 @@ protected:
 
 	virtual void OnKeyW(bool down) {
 		key_pressed = 'w';
-		movement_backward = true;
+		
 		if (movement_forward==true)
 			truck_movement_f += 0.04;
 		//_LOG_INFO() << "W " << (down ? "down." : "up.") << std::endl;
@@ -37,7 +37,8 @@ protected:
 
 	virtual void OnKeyS(bool down) {
 		key_pressed = 's';
-		movement_forward = true;
+		
+		cannon_scaling_up = true;
 		if (movement_backward == true)
 			truck_movement_f -= 0.04;
 		//_LOG_INFO() << "S " << (down ? "down." : "up.") << std::endl;
@@ -45,7 +46,7 @@ protected:
 
 	virtual void OnKeyA(bool down) {
 		key_pressed = 'a';
-		rotation_counter_clockwise = true;
+		
 		if (rotation_counter_clockwise == true)
 			cannon_rotation_f += glm::pi<float>() / 60.0;
 		//_LOG_INFO() << "A " << (down ? "down." : "up.") << std::endl;
@@ -53,15 +54,16 @@ protected:
 
 	virtual void OnKeyD(bool down) {
 		key_pressed = 'd';
-		rotation_clockwise = true;
+		
 		if (rotation_clockwise == true)
 			cannon_rotation_f -= glm::pi<float>() / 60.0;
 		//_LOG_INFO() << "D " << (down ? "down." : "up.") << std::endl;
 	}
 
 	virtual void OnKeyR(bool down) {
+		
 		key_pressed = 'r';
-		cannon_scaling_up = true;
+		
 		if (cannon_scaling_up == true)
 			cannon_scaling_f += 0.05;
 		//_LOG_INFO() << "R " << (down ? "down." : "up.") << std::endl;
@@ -69,7 +71,8 @@ protected:
 
 	virtual void OnKeyF(bool down) {
 		key_pressed = 'f';
-		cannon_scaling_down = true;
+		
+		
 		if (cannon_scaling_down == true){
 			if (cannon_scaling_f > 0.15)
 				cannon_scaling_f -= 0.05;
@@ -79,7 +82,7 @@ protected:
 
 	virtual void OnKeyQ(bool down) {
 		key_pressed = 'q';
-		tower_scaling_down = true;
+		
 		if (tower_scaling_down == true){
 			if (tower_scaling_f > 0.15)
 				tower_scaling_f -= 0.05;
@@ -89,7 +92,7 @@ protected:
 
 	virtual void OnKeyE(bool down) {
 		key_pressed = 'e';
-		tower_scaling_up = true;
+		
 		if (tower_scaling_up == true)
 			tower_scaling_f += 0.05;
 		//_LOG_INFO() << "E " << (down ? "down." : "up.") << std::endl;

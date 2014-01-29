@@ -14,11 +14,9 @@ cannon_rotation_f(0.0),
 rotation_counter_clockwise(0),
 rotation_clockwise(0),
 cannon_scaling_f(1.0),
-cannon_scaling_up(0),
-cannon_scaling_down(0),
 tower_scaling_f(1.0),
-tower_scaling_up(0),
-tower_scaling_down(0),
+tower_scaling_up(1),
+tower_scaling_down(1),
 scissors_rotation_f(0.0),
 scissors_closed(0)
 {
@@ -26,6 +24,8 @@ scissors_closed(0)
 	GLEWInit();
 	movement_forward = true;
 	movement_backward = true;
+	cannon_scaling_up = true;
+	cannon_scaling_down = true;
 	key_pressed = 'd'; //default
 	// Clear possible error from GLFW/GLEW initialization
 	glGetError();

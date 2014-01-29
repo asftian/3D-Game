@@ -30,7 +30,7 @@ mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.5
 mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.0, 0.0));
 mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, 0.15));
 mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, -0.15));
-mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(2, 0.0, 0.0));
+mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(2, 0.0, -2));
 mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.4, 0.0));
 
 //ROTATION MATRIX
@@ -43,21 +43,21 @@ mat4 scissor2_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 3.0
 CoreTP1::CoreTP1() :
 plane(vec3(8.0, 0.1, 6.0), vec3(1.0, 132.0 / 255, 132.0 / 255)),
 body(vec3(1.5, 0.7, 1.0), vec3(0.0, 217.0 / 255, 38.0 / 255), body_initial_shear),
-wheel_fl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
-wheel_fr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
-wheel_rl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
-wheel_rr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_fl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255), wheels_initial_rotation),
+wheel_fr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255), wheels_initial_rotation),
+wheel_rl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255), wheels_initial_rotation),
+wheel_rr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255), wheels_initial_rotation),
 tower(0.08, 0.7, vec3(1.0, 164.0 / 255, 1.0)),
 sphere_tower(0.14, vec3(1.0, 164.0 / 255, 1.0)),
-cannon(0.05, 1.0, vec3(1.0, 164.0 / 255, 1.0)),
+cannon(0.05, 1.0, vec3(1.0, 164.0 / 255, 1.0), cannon_initial_rotation),
 sphere_cannon(0.05, vec3(1.0, 164.0 / 255, 1.0)),
 scissor1(vec3(0.25, 0.01, 0.065), vec3(0.0, 0.0, 1.0), scissors_initial_shear),
 scissor2(vec3(0.25, 0.01, 0.065), vec3(0.0, 0.0, 1.0), inverse(scissors_initial_shear)),
 dynamite_body(0.2, 2.4, vec3(1.0, 0.0, 0.0)),
-dynamite_fuse(0.02, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
+dynamite_fuse(0.1, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
 Core()
 {
-	
+
 	/******* BABY MAKING ******/
 	body.AddChild(&wheel_fl);
 	body.AddChild(&wheel_fr);
@@ -77,13 +77,16 @@ Core()
 	//Positionnement de la camera.
 	//TODO
 	//En faire une deuxieme pour des points bonis qui sera toggle par une touche du clavier.
-	_viewMatrix = glm::lookAt(glm::vec3(3, 4, 10), glm::vec3(0, 1.5, 0), glm::vec3(0, 1, 0));
+	_viewMatrix = glm::lookAt(glm::vec3(3, 4, 7), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
-	
+
 }
 
 void CoreTP1::Render(double dt) //dt is the time unit
+
 {
+	
+
 	/******* DYNAMIC MATRIX DEFINITIONS ******/
 	mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
 	mat4 cannon_rotation = glm::rotate(glm::mat4(), cannon_rotation_f, glm::vec3(0.0, 1.0, 0.0));
@@ -102,26 +105,26 @@ void CoreTP1::Render(double dt) //dt is the time unit
 
 	wheel_fl.SetTransform(
 		glm::inverse(body_initial_translation)*
-		wheel_fl_initial_translation*
-		wheels_initial_rotation
+		wheel_fl_initial_translation
+		
 		);
 
 	wheel_fr.SetTransform(
 		glm::inverse(body_initial_translation)*
-		wheel_fr_initial_translation*
-		wheels_initial_rotation
+		wheel_fr_initial_translation
+		
 		);
 
 	wheel_rl.SetTransform(
 		glm::inverse(body_initial_translation)*
-		wheel_rl_initial_translation*
-		wheels_initial_rotation
+		wheel_rl_initial_translation
+		
 		);
 
 	wheel_rr.SetTransform(
 		glm::inverse(body_initial_translation)*
-		wheel_rr_initial_translation*
-		wheels_initial_rotation
+		wheel_rr_initial_translation
+		
 		);
 
 	tower.SetTransform(
@@ -130,22 +133,22 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		);
 
 	sphere_tower.SetTransform(
+
+		sphere_tower_initial_translation*
+		cannon_rotation*
 		glm::inverse(body_initial_translation)*
 		glm::inverse(tower_initial_translation)*
-		cannon_rotation*
-		sphere_tower_initial_translation*
 		glm::inverse(tower_scaling)
 		);
 
 	cannon.SetTransform(
 		glm::inverse(sphere_tower_initial_translation)*
 		cannon_scaling*
-		cannon_initial_translation*
-		cannon_initial_rotation
+		cannon_initial_translation
+		
 		);
 
 	sphere_cannon.SetTransform(
-		glm::inverse(cannon_initial_rotation)*
 		sphere_cannon_initial_translation*
 		glm::inverse(cannon_scaling)
 		);
@@ -188,20 +191,52 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	dynamite_fuse.Render();
 
 
-	/******* CHECKING FOR COLLISIONS ******/
-	if (Collisions::AABBDetection(body, dynamite_body)){
-		if (key_pressed = 'w')
+	///******* CHECKING FOR COLLISIONS ******/
+	//if (Collisions::AABBDetection(body, dynamite_body)){
+	//	if (key_pressed = 'w')
+	//		movement_forward = false;
+	//	else
+	//		movement_backward = false;
+	//}
+	//std::cout << Collisions::OBBDetection(cannon, dynamite_fuse);
+	//
+	//std::cout << Collisions::OBBDetection(cannon, dynamite_fuse);
+	cannon.GetBB().print("cannon");
+	dynamite_fuse.GetBB().print("fuse");
+	/*if (Collisions::OBBDetection(dynamite_fuse, sphere_cannon) ||
+		Collisions::OBBDetection(dynamite_body, body) ||
+		Collisions::OBBDetection(dynamite_fuse, cannon))
+	{
+		if (key_pressed == 'w'){
 			movement_forward = false;
-		else
-			movement_backward = false;
-	}
 
-	/*if (Collisions::AABBDetection(cannon, dynamite_body)){
-		if (key_pressed = 'a')
+		}
+		else if (key_pressed == 's'){
+			movement_backward = false;
+
+		}
+
+		else if (key_pressed == 'r')
+			cannon_scaling_up = false;
+		else if (key_pressed == 'a'){
+			cannon_rotation_f -= glm::pi<float>() / 60.0;
 			rotation_counter_clockwise = false;
-		else
+		}
+
+		else if (key_pressed == 'd'){
 			rotation_clockwise = false;
-	}*/
+			cannon_rotation_f += glm::pi<float>() / 60.0;
+		}
+
+		else if (key_pressed == 'r')
+			cannon_scaling_up = false;
+
+	}
+	else */
+		movement_forward = movement_backward = cannon_scaling_up = cannon_scaling_down = rotation_clockwise = rotation_counter_clockwise = true;
+	
+	
+
 }
 
 CoreTP1::~CoreTP1()

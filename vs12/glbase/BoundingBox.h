@@ -1,5 +1,6 @@
 #include <main.h>
 #include <array>
+#include <iomanip>
 using namespace glm;
 struct VertexPositionNormal
 {
@@ -33,6 +34,10 @@ std::array<vec3, 2> GetAABBFromVertices(const std::array<VertexPositionNormal, S
 }
 
 
+
+
+
+
 class BoundingBox{
 public:
 	BoundingBox();
@@ -45,17 +50,43 @@ public:
 	std::array<vec3, 2> GetAABB() const;
 	//OBB business
 	vec3 GetCenter() const;
-	std::array<vec3, 3> GetExtents() const;
+	std::array<float, 3> GetExtents() const;
 	std::array<vec3, 3> GetNormals() const;
 	void SetTransform(mat4& mat);
 	int set = 0;
 	virtual ~BoundingBox();
+	void print(std::string name){
+		std::cout << name << std::endl;
+		std::cout << "center is " << center.x << "," << center.y << "," << center.z << "\n";
+		std::cout << "normals are \n" << normals[0].x << "," << normals[0].y << "," << normals[0].z << "\n" << normals[1].x << "," << normals[1].y << "," << normals[1].z << "\n" << normals[2].x << "," << normals[2].y << "," << normals[2].z << "\n";
+		bool test = false;
+		float scal = dot(normals[0], normals[1]);
+		std::cout << "first dot product " << scal << "\n";
+
+		scal = dot(normals[0], normals[2]);
+		std::cout << "second dot product " << scal << "\n";
+
+		scal = dot(normals[1], normals[2]);
+		std::cout << "third dot product " << scal << "\n";
+
+
+		
+		std::cout << "extents are " << extents[0] << ","<< extents[1] << ","<< extents[2] << "\n";
+		for (int i = 0; i < 8; i++){
+			
+			printf ("%1.2f , %1.2f, %1.2f\n", points[i].x, points[i].y, points[i].z);
+		}
+		printf("\n");
+		
+	}
 protected:
 	std::array<vec3, 2> aabb;
 	std::array<vec3, 8> points;
 	std::array<vec3, 8> init_points;
 	std::array<vec3, 3> normals;
-	std::array<vec3, 3> extents;
+	std::array<vec3, 3> init_normals;
+	std::array<float, 3> extents;
+	std::array<float, 3> init_extents;
 	vec3 center;
 	
 	void SetCenter();

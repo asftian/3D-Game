@@ -62,7 +62,7 @@ class Cylinder : public Shape
 {
 public:
 	static const int slices;
-	Cylinder(double radius, double height, vec3 color);
+	Cylinder(double radius, double height, vec3 color, mat4& init_transf = mat4());
 	virtual void Render() override;
 protected:
 	double _radius, _height;
