@@ -1,12 +1,8 @@
 #pragma once
 
 #include <main.h>
-#include <array>
-#include <algorithm>
-#include "boundingbox.h"
-#include <iostream>
-#include <cmath>
 
+#include "../../vs12/glbase/boundingbox.h"
 using namespace glm;
 
 

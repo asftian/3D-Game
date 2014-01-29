@@ -29,6 +29,11 @@
 // Additional Includes
 #include <log.h>
 #include <iostream>
+#include <array>
+#include <algorithm>
+#include <cmath>
+
+
 
 // Utility Defines
 #define abstract = 0

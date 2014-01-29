@@ -34,11 +34,6 @@ std::array<vec3, 2> GetAABBFromVertices(const std::array<VertexPositionNormal, S
 	return results;
 }
 
-
-
-
-
-
 class BoundingBox{
 public:
 
