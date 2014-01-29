@@ -30,7 +30,7 @@ mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.5
 mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.0, 0.0));
 mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, 0.15));
 mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, -0.15));
-mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(2, 0.0, -2));
+mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.0, -2));
 mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.4, 0.0));
 
 //ROTATION MATRIX
@@ -54,7 +54,7 @@ sphere_cannon(0.05, vec3(1.0, 164.0 / 255, 1.0)),
 scissor1(vec3(0.25, 0.01, 0.065), vec3(0.0, 0.0, 1.0), scissors_initial_shear),
 scissor2(vec3(0.25, 0.01, 0.065), vec3(0.0, 0.0, 1.0), inverse(scissors_initial_shear)),
 dynamite_body(0.2, 2.4, vec3(1.0, 0.0, 0.0)),
-dynamite_fuse(0.1, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
+dynamite_fuse(0.02, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
 Core()
 {
 
@@ -198,11 +198,12 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	//	else
 	//		movement_backward = false;
 	//}
-	//std::cout << Collisions::OBBDetection(cannon, dynamite_fuse);
+	std::cout << Collisions::OBBDetection(cannon, dynamite_fuse);
 	//
-	//std::cout << Collisions::OBBDetection(cannon, dynamite_fuse);
-	cannon.GetBB().print("cannon");
-	dynamite_fuse.GetBB().print("fuse");
+	//std::cout << Collisions::OBBDetection(scissor1, dynamite_fuse);
+	//std::cout << Collisions::AABBDetection(body, dynamite_body);
+	//cannon.GetBB().print("cannon");
+	//dynamite_fuse.GetBB().print("fuse");
 	/*if (Collisions::OBBDetection(dynamite_fuse, sphere_cannon) ||
 		Collisions::OBBDetection(dynamite_body, body) ||
 		Collisions::OBBDetection(dynamite_fuse, cannon))

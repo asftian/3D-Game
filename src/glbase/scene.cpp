@@ -393,113 +393,93 @@ bool Collisions::AABBDetection(const Shape& shape1, const Shape& shape2){
 
 }
 bool Collisions::OBBDetection(const Shape& shape1, const Shape& shape2){
-	//TODO
-	BoundingBox& A = shape1.GetBB();
-	BoundingBox& B = shape2.GetBB();
+
+	//HYPERPLANE SEPARATION THEOREM (HST)
+	//algorithme emprunte du livre 
+	//
+	//*****************************************************************************************************
+	//Ericson, Christer, "Real-Time Collision Detection", Sony Computer Entertainment America, 2005, p.103
+	//*****************************************************************************************************
+	//
+	//Lalgorithme consiste a utiliser les axes des boites 
+	//orientees ainsi que leurs produits vectoriels pour
+	//projeter leurs points sur les 15 axes obtenus (3+3+3x3) 
+	//et determiner si il y a un espace entre 
+	//les points projetes, et donc entre les deux boites.
+	//S'il y a un espace, on peut tout de suite retourner faux 
+	//puisque cela qu'un plan peut s'infiltrer entre les deux boites
+	//et donc qu'il n'y a pas de collisions.
+	//
+	//Pour plus d'information: http://en.wikipedia.org/wiki/Hyperplane_separation_theorem
 	
-	vec3 D = B.GetCenter() - A.GetCenter();
+	BoundingBox a = shape1.GetBB();
+	BoundingBox b = shape2.GetBB();
+	float ra, rb;
+	mat3 R, AbsR;
+	// Compute rotation matrix expressing b in a’s coordinate frame
+	for (int i = 0; i < 3; i++)
+	for (int j = 0; j < 3; j++)
+		R[i][j] = dot(a.u[i], b.u[j]);
+	// Compute translation vector t
+	vec3 t = b.c - a.c;
+	// Bring translation into a’s coordinate frame
+	t = vec3(dot(t, a.u[0]), dot(t, a.u[2]), dot(t, a.u[2]));
+	// Compute common subexpressions. Add in an epsilon term to
+	// counteract arithmetic errors when two edges are parallel and
+	// their cross product is (near) null (see text for details)
+	for (int i = 0; i < 3; i++)
+	for (int j = 0; j < 3; j++)
+		AbsR[i][j] = abs(R[i][j]) + epsilon<double>();
+	// Test axes L = A0, L = A1, L = A2
+	for (int i = 0; i < 3; i++) {
+		ra = a.e[i];
+		rb = b.e[0] * AbsR[i][0] + b.e[1] * AbsR[i][1] + b.e[2] * AbsR[i][2];
+		if (abs(t[i]) > ra + rb) return 0;
+	}
+	// Test axes L = B0, L = B1, L = B2
+	for (int i = 0; i < 3; i++) {
+		ra = a.e[0] * AbsR[0][i] + a.e[1] * AbsR[1][i] + a.e[2] * AbsR[2][i];
+		rb = b.e[i];
+		if (abs(t[0] * R[0][i] + t[1] * R[1][i] + t[2] * R[2][i]) > ra + rb) return 0;
+	}
+	// Test axis L = A0 x B0
+	ra = a.e[1] * AbsR[2][0] + a.e[2] * AbsR[1][0];
+	rb = b.e[1] * AbsR[0][2] + b.e[2] * AbsR[0][1];
+	if (abs(t[2] * R[1][0] - t[1] * R[2][0]) > ra + rb) return 0;
+	// Test axis L = A0 x B1
+	ra = a.e[1] * AbsR[2][1] + a.e[2] * AbsR[1][1];
+	rb = b.e[0] * AbsR[0][2] + b.e[2] * AbsR[0][0];
+	if (abs(t[2] * R[1][1] - t[1] * R[2][1]) > ra + rb) return 0;
+	// Test axis L = A0 x B2
+	ra = a.e[1] * AbsR[2][2] + a.e[2] * AbsR[1][2];
+	rb = b.e[0] * AbsR[0][1] + b.e[1] * AbsR[0][0];
+	if (abs(t[2] * R[1][2] - t[1] * R[2][2]) > ra + rb) return 0;
+	// Test axis L = A1 x B0
+	ra = a.e[0] * AbsR[2][0] + a.e[2] * AbsR[0][0];
+	rb = b.e[1] * AbsR[1][2] + b.e[2] * AbsR[1][1];
+	if (abs(t[0] * R[2][0] - t[2] * R[0][0]) > ra + rb) return 0;
+	// Test axis L = A1 x B1
+	ra = a.e[0] * AbsR[2][1] + a.e[2] * AbsR[0][1];
+	rb = b.e[0] * AbsR[1][2] + b.e[2] * AbsR[1][0];
+	if (abs(t[0] * R[2][1] - t[2] * R[0][1]) > ra + rb) return 0;
+	// Test axis L = A1 x B2
+	ra = a.e[0] * AbsR[2][2] + a.e[2] * AbsR[0][2];
+	rb = b.e[0] * AbsR[1][1] + b.e[1] * AbsR[1][0];
+	if (abs(t[0] * R[2][2] - t[2] * R[0][2]) > ra + rb) return 0;
+	// Test axis L = A2 x B0
+	ra = a.e[0] * AbsR[1][0] + a.e[1] * AbsR[0][0];
+	rb = b.e[1] * AbsR[2][2] + b.e[2] * AbsR[2][1];
+	if (abs(t[1] * R[0][0] - t[0] * R[1][0]) > ra + rb) return 0;
+	// Test axis L = A2 x B1
+	ra = a.e[0] * AbsR[1][1] + a.e[1] * AbsR[0][1];
+	rb = b.e[0] * AbsR[2][2] + b.e[2] * AbsR[2][0];
+	if (abs(t[1] * R[0][1] - t[0] * R[1][1]) > ra + rb) return 0;
+	// Test axis L = A2 x B2
+	ra = a.e[0] * AbsR[1][2] + a.e[1] * AbsR[0][2];
+	rb = b.e[0] * AbsR[2][1] + b.e[1] * AbsR[2][0];
+	if (abs(t[1] * R[0][2] - t[0] * R[1][2]) > ra + rb) return 0;
+	// Since no separating axis is found, the OBBs must be intersecting
+	return 1;
 
-	float a0 = A.GetExtents().at(0);
-	float a1 = A.GetExtents().at(1);
-	float a2 = A.GetExtents().at(2);
-
-	vec3 A0 = A.GetNormals().at(0);
-	vec3 A1 = A.GetNormals().at(1);
-	vec3 A2 = A.GetNormals().at(2);
-
-	float b0 = B.GetExtents().at(0); 
-	float b1 = B.GetExtents().at(1);
-	float b2 = B.GetExtents().at(2);
-
-	vec3 B0 = B.GetNormals().at(0);
-	vec3 B1 = B.GetNormals().at(1);
-	vec3 B2 = B.GetNormals().at(2);
-	
-	float c00 = dot(A.GetNormals().at(0), B.GetNormals().at(0));
-	float c01 = dot(A.GetNormals().at(0), B.GetNormals().at(1));
-	float c02 = dot(A.GetNormals().at(0), B.GetNormals().at(2));
-	float c10 = dot(A.GetNormals().at(1), B.GetNormals().at(0));
-	float c11 = dot(A.GetNormals().at(1), B.GetNormals().at(1));
-	float c12 = dot(A.GetNormals().at(1), B.GetNormals().at(2));
-	float c20 = dot(A.GetNormals().at(2), B.GetNormals().at(0));
-	float c21 = dot(A.GetNormals().at(2), B.GetNormals().at(1));
-	float c22 = dot(A.GetNormals().at(2), B.GetNormals().at(2));
-
-	//A0
-	float R0 = a0;
-	float R1 = b0*abs(c00) + b1*abs(c01) + b2*abs(c02);
-	float R = abs(dot(A0, D));
-	if (R > (R0 + R1)) return false;
-	//A1
-	R0 = a1;
-	R1 = b0*abs(c10) + b1*abs(c11) + b2*abs(c12);
-	R = abs(dot(A1, D));
-	if (R > (R0 + R1)) return false;
-	//A2
-	R0 = a2;
-	R1 = b0*abs(c20) + b1*abs(c21) + b2*abs(c22);
-	R = abs(dot(A2, D));
-	if (R > (R0 + R1)) return false;
-	//B0
-	R0 = a0*abs(c00) + a1*abs(c10) + a2*abs(c20);
-	R1 = b0;
-	R = abs(dot(B0, D));
-	if (R > (R0 + R1)) return false;
-	//B1
-	R0 = a0*abs(c01) + a1*abs(c11) + a2*abs(c21);
-	R1 = b1;
-	R = abs(dot(B1, D));
-	if (R > (R0 + R1)) return false;
-	//B2
-	R0 = a0*abs(c02) + a1*abs(c12) + a2*abs(c22);
-	R1 = b2;
-	R = abs(dot(B2, D));
-	if (R > (R0 + R1)) return false;
-	//A0 x B0
-	R0 = a1 * abs(c20) + a2 * abs(c10);
-	R1 = b1*abs(c02) + b2*abs(c01);
-	R = abs(dot(c10*A2, D) - dot(c20*A1, D));
-	if (R > (R0 + R1)) return false;
-	//A0 x B1
-	R0 = a1 * abs(c21) + a2 * abs(c11);
-	R1 = b0*abs(c02) + b2*abs(c00);
-	R = abs(dot(c11*A2, D) - dot(c21*A1, D));
-	if (R > (R0 + R1)) return false;
-	//A0 x B2
-	R0 = a1 * abs(c22) + a2 * abs(c12);
-	R1 = b0*abs(c01) + b1*abs(c00);
-	R = abs(dot(c12*A2, D) - dot(c22*A1, D));
-	if (R > (R0 + R1)) return false;
-	//A1 x B0
-	R0 = a0 * c20 + a2 * c00;
-	R1 = b1*abs(c12) + b2*abs(c11);
-	R = abs(dot(c20*A0, D) - dot(c00*A2, D));
-	if (R > (R0 + R1)) return false;
-	//A1 x B1
-	R0 = a0 * abs(c21) + a2 * abs(c01);
-	R1 = b0*abs(c12) + b2*abs(c10);
-	R = abs(dot(c21*A0, D) - dot(c01*A2, D));
-	if (R > (R0 + R1)) return false;
-	//A1 x B2
-	R0 = a0 * abs(c22) + a2 * abs(c02);
-	R1 = b0*abs(c11) + b1*abs(c10);
-	R = abs(dot(c22*A0, D) - dot(c02*A2, D));
-	if (R > (R0 + R1)) return false;
-	//A2 x B0
-	R0 = a0 * abs(c10) + a1 * abs(c00);
-	R1 = b1*abs(c22) + b2*abs(c21);
-	R = abs(dot(c00*A1, D) - dot(c10*A0, D));
-	if (R > (R0 + R1)) return false;
-	//A2 x B1
-	R0 = a0 * abs(c11) + a1 * abs(c01);
-	R1 = b0*abs(c22) + b2*abs(c20);
-	R = abs(dot(c01*A1, D) - dot(c11*A0, D));
-	if (R > (R0 + R1)) return false;
-	//A2 x B2
-	R0 = a0 * abs(c12) + a1 * abs(c02);
-	R1 = b0*abs(c21) + b1*abs(c20);
-	R = abs(dot(c02*A1, D) - dot(c12*A0, D));
-	if (R > (R0 + R1)) return false;
-	return true;
 }
 

@@ -51,14 +51,14 @@ std::array<vec3, 2> BoundingBox::GetAABB() const{
 }
 
 vec3 BoundingBox::GetCenter() const{
-	return center;
+	return c;
 }
 
 std::array<float, 3> BoundingBox::GetExtents() const{
-	return extents;
+	return e;
 }
 std::array<vec3, 3> BoundingBox::GetNormals() const{
-	return normals;
+	return u;
 }
 void BoundingBox::SetTransform(mat4& mat){
 
@@ -75,9 +75,10 @@ void BoundingBox::SetTransform(mat4& mat){
 }
 
 void BoundingBox::SetNormals(){
-	normals.at(0) = normalize(points.at(4) - points.at(1)); //axe des x
-	normals.at(1) = normalize(points.at(6) - points.at(1)); //axe des y
-	normals.at(2) = normalize(points.at(7) - points.at(1)); //axe des z
+	u.at(0) = normalize(points.at(4) - points.at(1)); //axe des x
+	u.at(1) = normalize(points.at(6) - points.at(1)); //axe des y
+	u.at(2) = normalize(points.at(7) - points.at(1)); //axe des z
+	
 	
 }
 void BoundingBox::SetCenter(){
@@ -93,14 +94,14 @@ void BoundingBox::SetCenter(){
 	auto resultZ = std::minmax_element(points.begin(), points.end(), [](const vec3& lhs, const vec3& rhs) {
 		return lhs.z < rhs.z;
 	});
-	center.x = resultX.first->x + (resultX.second->x - resultX.first->x) / 2;
-	center.y = resultY.first->y + (resultY.second->y - resultY.first->y) / 2;
-	center.z = resultY.first->z + (resultZ.second->z - resultZ.first->z) / 2;
+	c.x = resultX.first->x + (resultX.second->x - resultX.first->x) / 2;
+	c.y = resultY.first->y + (resultY.second->y - resultY.first->y) / 2;
+	c.z = resultZ.first->z + (resultZ.second->z - resultZ.first->z) / 2;
 }
 void BoundingBox::SetExtents(){
-	extents.at(0) = glm::length(points.at(2) - points.at(7))/2; //fbl-rbl
-	extents.at(1) = glm::length(points.at(0) - points.at(2))/2; //axe des y
-	extents.at(2) = glm::length(points.at(2) - points.at(4))/2; //axe des z
+	e.at(0) = glm::length(points.at(2) - points.at(7))/2; //fbl-rbl
+	e.at(1) = glm::length(points.at(0) - points.at(2))/2; //axe des y
+	e.at(2) = glm::length(points.at(2) - points.at(4))/2; //axe des z
 }
 
 BoundingBox::~BoundingBox(){

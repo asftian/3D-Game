@@ -57,21 +57,21 @@ public:
 	virtual ~BoundingBox();
 	void print(std::string name){
 		std::cout << name << std::endl;
-		std::cout << "center is " << center.x << "," << center.y << "," << center.z << "\n";
-		std::cout << "normals are \n" << normals[0].x << "," << normals[0].y << "," << normals[0].z << "\n" << normals[1].x << "," << normals[1].y << "," << normals[1].z << "\n" << normals[2].x << "," << normals[2].y << "," << normals[2].z << "\n";
+		std::cout << "center is " << c.x << "," << c.y << "," << c.z << "\n";
+		std::cout << "normals are \n" << u[0].x << "," << u[0].y << "," << u[0].z << "\n" << u[1].x << "," << u[1].y << "," << u[1].z << "\n" << u[2].x << "," << u[2].y << "," << u[2].z << "\n";
 		bool test = false;
-		float scal = dot(normals[0], normals[1]);
+		float scal = dot(u[0], u[1]);
 		std::cout << "first dot product " << scal << "\n";
 
-		scal = dot(normals[0], normals[2]);
+		scal = dot(u[0], u[2]);
 		std::cout << "second dot product " << scal << "\n";
 
-		scal = dot(normals[1], normals[2]);
+		scal = dot(u[1], u[2]);
 		std::cout << "third dot product " << scal << "\n";
 
 
 		
-		std::cout << "extents are " << extents[0] << ","<< extents[1] << ","<< extents[2] << "\n";
+		std::cout << "extents are " << e[0] << ","<< e[1] << ","<< e[2] << "\n";
 		for (int i = 0; i < 8; i++){
 			
 			printf ("%1.2f , %1.2f, %1.2f\n", points[i].x, points[i].y, points[i].z);
@@ -79,15 +79,18 @@ public:
 		printf("\n");
 		
 	}
+	std::array<float, 3> e;
+	std::array<vec3, 3> u;
+	vec3 c;
 protected:
 	std::array<vec3, 2> aabb;
 	std::array<vec3, 8> points;
 	std::array<vec3, 8> init_points;
-	std::array<vec3, 3> normals;
+	
 	std::array<vec3, 3> init_normals;
-	std::array<float, 3> extents;
+	
 	std::array<float, 3> init_extents;
-	vec3 center;
+	
 	
 	void SetCenter();
 	void SetNormals();
