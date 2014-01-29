@@ -2,7 +2,7 @@
 #include <main.h>
 #include "core.h"
 #include "scene.h"
-
+#include "collisions.h"
 
 class CoreTP1 : public Core
 {

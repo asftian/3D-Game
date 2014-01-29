@@ -1,6 +1,7 @@
 #include <main.h>
 #include <array>
 #include <iomanip>
+
 using namespace glm;
 struct VertexPositionNormal
 {
@@ -40,58 +41,37 @@ std::array<vec3, 2> GetAABBFromVertices(const std::array<VertexPositionNormal, S
 
 class BoundingBox{
 public:
+
+	//Default constructor, mets "set" a 0
 	BoundingBox();
 	//Prend en entree une axis oriented bounding box de 2 points
-	BoundingBox(const std::array<vec3,2>& arr);
+	BoundingBox(const std::array<vec3, 2>& arr);
+	//Fonction qui returne true ou false tout dependamment de si la boite a ete set
+	bool IsSet();
 
-	//AABB business
-
+	//AABB business. Les AABB fournisse une logique de collision plus simple, utile dans le cas des
+	//formes alignees avec les axes. Des que lobjet est pivote, il est preferable d'utiliser la OBB
 	void setAABB();
 	std::array<vec3, 2> GetAABB() const;
+
 	//OBB business
-	vec3 GetCenter() const;
-	std::array<float, 3> GetExtents() const;
-	std::array<vec3, 3> GetNormals() const;
 	void SetTransform(mat4& mat);
-	int set = 0;
+	//Fonction d'impression
+	void print(std::string name);
 	virtual ~BoundingBox();
-	void print(std::string name){
-		std::cout << name << std::endl;
-		std::cout << "center is " << c.x << "," << c.y << "," << c.z << "\n";
-		std::cout << "normals are \n" << u[0].x << "," << u[0].y << "," << u[0].z << "\n" << u[1].x << "," << u[1].y << "," << u[1].z << "\n" << u[2].x << "," << u[2].y << "," << u[2].z << "\n";
-		bool test = false;
-		float scal = dot(u[0], u[1]);
-		std::cout << "first dot product " << scal << "\n";
 
-		scal = dot(u[0], u[2]);
-		std::cout << "second dot product " << scal << "\n";
-
-		scal = dot(u[1], u[2]);
-		std::cout << "third dot product " << scal << "\n";
-
-
-		
-		std::cout << "extents are " << e[0] << ","<< e[1] << ","<< e[2] << "\n";
-		for (int i = 0; i < 8; i++){
-			
-			printf ("%1.2f , %1.2f, %1.2f\n", points[i].x, points[i].y, points[i].z);
-		}
-		printf("\n");
-		
-	}
+	//Extents (distance du centre a une face suivant l'axe associe)
 	std::array<float, 3> e;
+	//Repere d'axes
 	std::array<vec3, 3> u;
+	//Centre
 	vec3 c;
 protected:
+
+	bool set;
 	std::array<vec3, 2> aabb;
 	std::array<vec3, 8> points;
 	std::array<vec3, 8> init_points;
-	
-	std::array<vec3, 3> init_normals;
-	
-	std::array<float, 3> init_extents;
-	
-	
 	void SetCenter();
 	void SetNormals();
 	void SetExtents();

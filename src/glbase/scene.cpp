@@ -369,20 +369,11 @@ void Sphere::Render()
 
 }
 #pragma endregion
-
+#pragma region COLLISIONS
 bool Collisions::AABBDetection(const Shape& shape1, const Shape& shape2){
 
 	std::array<vec3, 2> b1 = shape1.GetBB().GetAABB();
 	std::array<vec3, 2> b2 = shape2.GetBB().GetAABB();
-	/*
-	std::cout << "Le point min du cannon est " << b1[1].x << std::endl;
-	std::cout << "Le point max de la fuse est " << b2[0].x << std::endl;
-	std::cout << (b1[0].x > b2[1].x) << std::endl;
-	std::cout << (b1[1].x < b2[0].x) << std::endl;
-	std::cout << (b1[0].y > b2[1].y) << std::endl;
-	std::cout << (b1[1].y < b2[0].y) << std::endl;
-	std::cout << (b1[0].z > b2[1].z) << std::endl;
-	std::cout << (b1[1].z < b2[0].z) << "\n\n";*/
 
 	return(b1[0].x > b2[1].x &&
 		b1[1].x < b2[0].x &&
@@ -491,4 +482,5 @@ bool Collisions::OBBDetection(const Shape& shape1, const Shape& shape2){
 	return 1;
 
 }
+#pragma endregion
 
