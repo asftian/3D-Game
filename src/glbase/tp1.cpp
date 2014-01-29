@@ -32,6 +32,7 @@ mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0
 mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, 0.15));
 mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, -0.15));
 mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.0, -2));
+mat4 dynamite_body_initial_translation2 = glm::translate(glm::mat4(), glm::vec3(2, 0.0, 0));
 mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.4, 0.0));
 
 //ROTATION MATRIX
@@ -55,7 +56,9 @@ sphere_cannon(0.05, vec3(1.0, 164.0 / 255, 1.0)),
 scissor1(vec3(0.25, 0.01, 0.065), vec3(0.0, 0.0, 1.0), scissors_initial_shear),
 scissor2(vec3(0.25, 0.01, 0.065), vec3(0.0, 0.0, 1.0), inverse(scissors_initial_shear)),
 dynamite_body(0.2, 2.4, vec3(1.0, 0.0, 0.0)),
+dynamite_body2(0.2, 2.4, vec3(1.0, 0.0, 0.0)),
 dynamite_fuse(0.02, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
+dynamite_fuse2(0.02, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
 Core()
 {
 
@@ -71,6 +74,7 @@ Core()
 	sphere_cannon.AddChild(&scissor1);
 	sphere_cannon.AddChild(&scissor2);
 	dynamite_body.AddChild(&dynamite_fuse);
+	dynamite_body2.AddChild(&dynamite_fuse2);
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 
@@ -88,7 +92,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 {
 	if (Collisions::AABBDetection(dynamite_fuse, sphere_cannon) ||
 		Collisions::AABBDetection(dynamite_body, body) ||
-		Collisions::OBBDetection(cannon, dynamite_fuse))
+		Collisions::OBBDetection(cannon, dynamite_fuse) ||
+		Collisions::OBBDetection(cannon, dynamite_fuse2) ||
+		Collisions::AABBDetection(dynamite_body2, body))
 	{
 		if (key_pressed == 'w'){
 			movement_forward = false;
@@ -211,6 +217,12 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	dynamite_fuse.SetTransform(
 		dynamite_fuse_initial_translation
 		);
+	dynamite_body2.SetTransform(
+		dynamite_body_initial_translation2
+		);
+	dynamite_fuse2.SetTransform(
+		dynamite_fuse_initial_translation
+		);
 
 
 	/******* RENDERING ******/
@@ -227,6 +239,8 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	scissor1.Render();
 	scissor2.Render();
 	dynamite_body.Render();
+	dynamite_body2.Render();
+	dynamite_fuse2.Render();
 	dynamite_fuse.Render();
 
 

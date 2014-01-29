@@ -27,7 +27,10 @@ protected:
 	Box scissor1;
 	Box scissor2;	
 	Cylinder dynamite_body;
+	Cylinder dynamite_body2;
 	Cylinder dynamite_fuse;	
+	Cylinder dynamite_fuse2;
+
 
 	std::vector<Node> nodes;	
 };
