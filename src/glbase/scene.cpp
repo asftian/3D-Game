@@ -417,13 +417,22 @@ bool Collisions::OBBDetection(const Shape& shape1, const Shape& shape2){
 	float ra, rb;
 	mat3 R, AbsR;
 	// Compute rotation matrix expressing b in a’s coordinate frame
-	for (int i = 0; i < 3; i++)
-	for (int j = 0; j < 3; j++)
-		R[i][j] = dot(a.u[i], b.u[j]);
+	for (int i = 0; i < 3; i++){
+		for (int j = 0; j < 3; j++){
+			R[i][j] = dot(a.u[i], b.u[j]);
+		}
+
+	}
+	
+		
 	// Compute translation vector t
 	vec3 t = b.c - a.c;
 	// Bring translation into a’s coordinate frame
-	t = vec3(dot(t, a.u[0]), dot(t, a.u[2]), dot(t, a.u[2]));
+	//ERRATA
+	t = vec3(dot(t, a.u[0]), dot(t, a.u[1]), dot(t, a.u[2]));
+    
+	//t = vec3(dot(t, a.u[0]), dot(t, a.u[2]), dot(t, a.u[2]));
+
 	// Compute common subexpressions. Add in an epsilon term to
 	// counteract arithmetic errors when two edges are parallel and
 	// their cross product is (near) null (see text for details)

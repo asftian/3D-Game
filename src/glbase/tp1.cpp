@@ -201,42 +201,42 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	//	else
 	//		movement_backward = false;
 	//}
-	std::cout << Collisions::OBBDetection(cannon, dynamite_fuse);
+	std::cout << Collisions::OBBDetection(dynamite_fuse, cannon);
 	//
 	//std::cout << Collisions::OBBDetection(scissor1, dynamite_fuse);
 	//std::cout << Collisions::AABBDetection(body, dynamite_body);
 	//cannon.GetBB().print("cannon");
 	//dynamite_fuse.GetBB().print("fuse");
-	/*if (Collisions::OBBDetection(dynamite_fuse, sphere_cannon) ||
-		Collisions::OBBDetection(dynamite_body, body) ||
-		Collisions::OBBDetection(dynamite_fuse, cannon))
-	{
-		if (key_pressed == 'w'){
-			movement_forward = false;
+	//if (Collisions::AABBDetection(dynamite_fuse, sphere_cannon) ||
+	//	Collisions::AABBDetection(dynamite_body, body) ||
+	//	Collisions::OBBDetection(cannon,dynamite_fuse))
+	//{
+	//	if (key_pressed == 'w'){
+	//		movement_forward = false;
 
-		}
-		else if (key_pressed == 's'){
-			movement_backward = false;
+	//	}
+	//	else if (key_pressed == 's'){
+	//		movement_backward = false;
 
-		}
+	//	}
 
-		else if (key_pressed == 'r')
-			cannon_scaling_up = false;
-		else if (key_pressed == 'a'){
-			cannon_rotation_f -= glm::pi<float>() / 60.0;
-			rotation_counter_clockwise = false;
-		}
+	//	else if (key_pressed == 'r')
+	//		cannon_scaling_up = false;
+	//	else if (key_pressed == 'a'){
+	//		//cannon_rotation_f -= glm::pi<float>() / 60.0;
+	//		rotation_counter_clockwise = false;
+	//	}
 
-		else if (key_pressed == 'd'){
-			rotation_clockwise = false;
-			cannon_rotation_f += glm::pi<float>() / 60.0;
-		}
+	//	else if (key_pressed == 'd'){
+	//		rotation_clockwise = false;
+	//		//cannon_rotation_f += glm::pi<float>() / 60.0;
+	//	}
 
-		else if (key_pressed == 'r')
-			cannon_scaling_up = false;
+	//	else if (key_pressed == 'r')
+	//		cannon_scaling_up = false;
 
-	}
-	else */
+	//}
+	//else 
 		movement_forward = movement_backward = cannon_scaling_up = cannon_scaling_down = rotation_clockwise = rotation_counter_clockwise = true;
 	
 	
