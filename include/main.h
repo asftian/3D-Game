@@ -32,6 +32,7 @@
 #include <array>
 #include <algorithm>
 #include <cmath>
+#include "../vs12/glbase/vertexpositionnormal.h"
 
 
 
