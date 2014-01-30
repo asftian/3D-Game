@@ -38,9 +38,9 @@ mat4 tower_initial_translation2 = glm::translate(glm::mat4(), glm::vec3(0, 0.35,
 mat4 sphere_tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 1.6, 0));
 mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.6, 0.0));
 mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.0, 0.0));
-mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, 0.15));
-mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, -0.15));
-mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.0, -2));
+mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.11, 0.0, 0.25));
+mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.11, 0.0, -0.25));
+mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.0, 2));
 mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.4, 0.0));
 
 //ROTATION MATRIX
@@ -87,7 +87,7 @@ Core()
 	//Positionnement de la camera.
 	//TODO
 	//En faire une deuxieme pour des points bonis qui sera toggle par une touche du clavier.
-	_viewMatrix = glm::lookAt(glm::vec3(3, 4, 7), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 7), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
 void CoreTP1::Render(double dt) //dt is the time unit
@@ -96,7 +96,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	bool dontcut = true;
 	if (Collisions::AABBDetection(dynamite_fuse, sphere_cannon) ||
 		Collisions::AABBDetection(dynamite_body, body) ||
-		Collisions::OBBDetection(cannon, dynamite_fuse) )
+		Collisions::OBBDetection(cannon, dynamite_fuse) ||
+		Collisions::OBBDetection(scissor1, dynamite_fuse) || 
+		Collisions::OBBDetection(scissor2, dynamite_fuse))
 	{
 		if (key_pressed == 'w'){
 			movement_forward = false;
@@ -118,8 +120,12 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			cannon_rotation_f += glm::pi<float>() / 120.0;
 		}
 
-		else if (key_pressed == 'r')
-			cannon_scaling_up = false;
+		else if (key_pressed == 'f')
+			cannon_scaling_down = false;
+		else if (key_pressed == 'q')
+			tower_scaling_down = false;
+		else if (key_pressed == 'e')
+			tower_scaling_up = false;
 
 	}
 	else{
@@ -127,26 +133,22 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			movement_backward =
 			cannon_scaling_up =
 			cannon_scaling_down =
+			tower_scaling_down =
+			tower_scaling_up =
 			rotation_clockwise =
 			rotation_counter_clockwise =
 			true;
 	}
 
-	if (Collisions::AABBDetection(scissor1, dynamite_fuse) &&
-		Collisions::AABBDetection(scissor2, dynamite_fuse)){
-		if (key_pressed == 'S'){
-
-		}
-			//dontcut = false;
-	}
+	
 
 
 
 	
 	if (scissors_animation){
 		
-		if (scissors_rotation_f < 1 && !descent){
-			if (skipframe<3){
+		if (scissors_rotation_f < 1.1 && !descent){
+			if (skipframe<5){
 				
 				skipframe ++;
 			}
@@ -156,11 +158,11 @@ void CoreTP1::Render(double dt) //dt is the time unit
 				}
 			}
 			
-			scissors_rotation_f += 0.1;
+			scissors_rotation_f += 0.02;
 		}
 		else{
 			descent = true;
-			scissors_rotation_f -= 0.1;
+			scissors_rotation_f -= 0.02;
 			if (scissors_rotation_f <= 0){
 				scissors_animation = false;
 				descent = false;
