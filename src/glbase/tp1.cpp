@@ -96,22 +96,22 @@ void CoreTP1::Render(double dt) //dt is the time unit
 {	
 	if (timeUnit <= 5000){
 		if (timeUnit <=800 && !showCountdown)
-			DrawText("Get Ready!", vec2(0.03, 0.05));
+			DrawText("Get Ready!", vec2(0.5,0.5));
 		else if (!showCountdown){
 			showCountdown = true;
 			timeUnit = 0;
 		}
 		if (showCountdown){
 			if (timeUnit <= 1000)
-				DrawText("5", vec2(0.03, 0.05));
+				DrawText("5", vec2(0.5, 0.5));
 			else if (timeUnit <= 2000)
-				DrawText("4", vec2(0.03, 0.05));
+				DrawText("4", vec2(0.5, 0.5));
 			else if (timeUnit <= 3000)
-				DrawText("3", vec2(0.03, 0.05));
+				DrawText("3", vec2(0.5, 0.5));
 			else if (timeUnit <= 4000)
-				DrawText("2", vec2(0.03, 0.05));
+				DrawText("2", vec2(0.5, 0.5));
 			else if (timeUnit <= 5000)
-				DrawText("1", vec2(0.03, 0.05));
+				DrawText("1", vec2(0.5, 0.5));
 		}
 		
 	}
@@ -121,7 +121,10 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			Collisions::AABBDetection(dynamite_body, body) ||
 			Collisions::OBBDetection(cannon, dynamite_fuse) ||
 			Collisions::OBBDetection(scissor1, dynamite_fuse) ||
-			Collisions::OBBDetection(scissor2, dynamite_fuse))
+			Collisions::OBBDetection(scissor2, dynamite_fuse) ||
+			Collisions::OBBDetection(cannon, dynamite_body) ||
+			Collisions::OBBDetection(scissor1, dynamite_body) ||
+			Collisions::OBBDetection(scissor2, dynamite_body))
 		{
 			if (key_pressed == 'w'){
 				movement_forward = false;
@@ -197,12 +200,18 @@ void CoreTP1::Render(double dt) //dt is the time unit
 
 
 		/******* DYNAMIC MATRIX DEFINITIONS ******/
-		if (truck_movement_f >= 3.0){
+		if (truck_movement_f >= 3.0)
 			truck_movement_f = 3.0;
-		}
-		if (truck_movement_f <= -3.0){
+		if (truck_movement_f <= -3.0)
 			truck_movement_f = -3.0;
-		}
+		if (cannon_scaling_f >= 3)
+			cannon_scaling_f = 3;
+		if (cannon_scaling_f <= 0.1)
+			cannon_scaling_f = 0.1;
+		if (tower_scaling_f >= 2)
+			tower_scaling_f = 2;
+		if (tower_scaling_f <= 0.1)
+			tower_scaling_f = 0.1;
 		mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
 		mat4 cannon_rotation = glm::rotate(glm::mat4(), cannon_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 cannon_scaling = glm::scale(glm::mat4(), glm::vec3(cannon_scaling_f, 1.0, 1.0));
