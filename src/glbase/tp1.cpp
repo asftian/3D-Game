@@ -89,7 +89,7 @@ Core()
 	//Positionnement de la camera.
 	//TODO
 	//En faire une deuxieme pour des points bonis qui sera toggle par une touche du clavier.
-	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 7), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 9), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
 void CoreTP1::Render(double dt) //dt is the time unit
@@ -197,6 +197,12 @@ void CoreTP1::Render(double dt) //dt is the time unit
 
 
 		/******* DYNAMIC MATRIX DEFINITIONS ******/
+		if (truck_movement_f >= 3.0){
+			truck_movement_f = 3.0;
+		}
+		if (truck_movement_f <= -3.0){
+			truck_movement_f = -3.0;
+		}
 		mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
 		mat4 cannon_rotation = glm::rotate(glm::mat4(), cannon_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 cannon_scaling = glm::scale(glm::mat4(), glm::vec3(cannon_scaling_f, 1.0, 1.0));
