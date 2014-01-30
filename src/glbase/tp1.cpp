@@ -1,7 +1,15 @@
 #include "tp1.h"
 #include <iostream>
 
+/***************************/
+//***TODO
+//
+//-rajouter un cube sur la roue pour la voir tourner et la faire tourner
+//-rajouter lanimation des sciseaux avec la touche correspondante
+//-implanter la dynamique de jeu
+//-
 bool temp = false;
+int skipframe = 0;
 float body_shear[16] = {
 	1, 0, 0, 0,
 	-0.5, 1, 0, 0,
@@ -14,6 +22,7 @@ float scissors_shear[16] = {
 	-2, 0, 1, 0,
 	0, 0, 0, 1 };
 
+bool descent = false;
 //SHEAR
 mat4 body_initial_shear = glm::make_mat4(body_shear);
 mat4 scissors_initial_shear = glm::make_mat4(scissors_shear);
@@ -32,14 +41,13 @@ mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0
 mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, 0.15));
 mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.12, 0.0, -0.15));
 mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.0, -2));
-mat4 dynamite_body_initial_translation2 = glm::translate(glm::mat4(), glm::vec3(2, 0.0, 0));
 mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.4, 0.0));
 
 //ROTATION MATRIX
 mat4 cannon_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 2.0f, glm::vec3(0, 0, 1));
 mat4 wheels_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 2.0f, glm::vec3(1, 0, 0));
-mat4 scissor1_initial_rotation = glm::rotate(glm::mat4(), -glm::pi<float>() / 3.0f, glm::vec3(0, 1, 0));
-mat4 scissor2_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 3.0f, glm::vec3(0, 1, 0));
+mat4 scissor1_initial_rotation = glm::rotate(glm::mat4(), -glm::pi<float>() / 2.5f, glm::vec3(0, 1, 0));
+mat4 scissor2_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 2.5f, glm::vec3(0, 1, 0));
 
 
 CoreTP1::CoreTP1() :
@@ -53,12 +61,10 @@ tower(0.08, 0.7, vec3(1.0, 164.0 / 255, 1.0)),
 sphere_tower(0.14, vec3(1.0, 164.0 / 255, 1.0)),
 cannon(0.05, 1.0, vec3(1.0, 164.0 / 255, 1.0), cannon_initial_rotation),
 sphere_cannon(0.05, vec3(1.0, 164.0 / 255, 1.0)),
-scissor1(vec3(0.25, 0.01, 0.065), vec3(0.0, 0.0, 1.0), scissors_initial_shear),
-scissor2(vec3(0.25, 0.01, 0.065), vec3(0.0, 0.0, 1.0), inverse(scissors_initial_shear)),
+scissor1(vec3(0.3, 0.01, 0.090), vec3(0.0, 0.0, 1.0), scissors_initial_shear),
+scissor2(vec3(0.3, 0.01, 0.090), vec3(0.0, 0.0, 1.0), inverse(scissors_initial_shear)),
 dynamite_body(0.2, 2.4, vec3(1.0, 0.0, 0.0)),
-dynamite_body2(0.2, 2.4, vec3(1.0, 0.0, 0.0)),
 dynamite_fuse(0.02, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
-dynamite_fuse2(0.02, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
 Core()
 {
 
@@ -74,7 +80,6 @@ Core()
 	sphere_cannon.AddChild(&scissor1);
 	sphere_cannon.AddChild(&scissor2);
 	dynamite_body.AddChild(&dynamite_fuse);
-	dynamite_body2.AddChild(&dynamite_fuse2);
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 
@@ -83,18 +88,15 @@ Core()
 	//TODO
 	//En faire une deuxieme pour des points bonis qui sera toggle par une touche du clavier.
 	_viewMatrix = glm::lookAt(glm::vec3(3, 4, 7), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-
-
 }
 
 void CoreTP1::Render(double dt) //dt is the time unit
 
 {
+	bool dontcut = true;
 	if (Collisions::AABBDetection(dynamite_fuse, sphere_cannon) ||
 		Collisions::AABBDetection(dynamite_body, body) ||
-		Collisions::OBBDetection(cannon, dynamite_fuse) ||
-		Collisions::OBBDetection(cannon, dynamite_fuse2) ||
-		Collisions::AABBDetection(dynamite_body2, body))
+		Collisions::OBBDetection(cannon, dynamite_fuse) )
 	{
 		if (key_pressed == 'w'){
 			movement_forward = false;
@@ -102,33 +104,70 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		}
 		else if (key_pressed == 's'){
 			movement_backward = false;
-
 		}
 
 		else if (key_pressed == 'r')
 			cannon_scaling_up = false;
 		else if (key_pressed == 'a'){
-			cannon_rotation_f -= glm::pi<float>() / 60.0;
+			cannon_rotation_f -= glm::pi<float>() / 120.0;
 			rotation_counter_clockwise = false;
 		}
 
 		else if (key_pressed == 'd'){
 			rotation_clockwise = false;
-			cannon_rotation_f += glm::pi<float>() / 60.0;
+			cannon_rotation_f += glm::pi<float>() / 120.0;
 		}
 
 		else if (key_pressed == 'r')
 			cannon_scaling_up = false;
 
 	}
-	else
-		movement_forward = 
-		movement_backward = 
-		cannon_scaling_up = 
-		cannon_scaling_down = 
-		rotation_clockwise = 
-		rotation_counter_clockwise = true;
+	else{
+		movement_forward =
+			movement_backward =
+			cannon_scaling_up =
+			cannon_scaling_down =
+			rotation_clockwise =
+			rotation_counter_clockwise =
+			true;
+	}
+
+	if (Collisions::AABBDetection(scissor1, dynamite_fuse) &&
+		Collisions::AABBDetection(scissor2, dynamite_fuse)){
+		if (key_pressed == 'S'){
+
+		}
+			//dontcut = false;
+	}
+
+
+
 	
+	if (scissors_animation){
+		
+		if (scissors_rotation_f < 1 && !descent){
+			if (skipframe<3){
+				
+				skipframe ++;
+			}
+			else {
+				if (Collisions::OBBDetection(scissor1, dynamite_fuse) || Collisions::OBBDetection(scissor2, dynamite_fuse)){
+					dontcut = false;
+				}
+			}
+			
+			scissors_rotation_f += 0.1;
+		}
+		else{
+			descent = true;
+			scissors_rotation_f -= 0.1;
+			if (scissors_rotation_f <= 0){
+				scissors_animation = false;
+				descent = false;
+			}
+		}
+		if (!scissors_animation) skipframe = 0;
+	}
 
 	/******* DYNAMIC MATRIX DEFINITIONS ******/
 	mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
@@ -149,25 +188,25 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	wheel_fl.SetTransform(
 		glm::inverse(body_initial_translation)*
 		wheel_fl_initial_translation
-		
+
 		);
 
 	wheel_fr.SetTransform(
 		glm::inverse(body_initial_translation)*
 		wheel_fr_initial_translation
-		
+
 		);
 
 	wheel_rl.SetTransform(
 		glm::inverse(body_initial_translation)*
 		wheel_rl_initial_translation
-		
+
 		);
 
 	wheel_rr.SetTransform(
 		glm::inverse(body_initial_translation)*
 		wheel_rr_initial_translation
-		
+
 		);
 
 	tower.SetTransform(
@@ -176,7 +215,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		tower_initial_translation2
 		);
 
-	sphere_tower.SetTransform(	
+	sphere_tower.SetTransform(
 
 		sphere_tower_initial_translation*
 		cannon_rotation*
@@ -190,7 +229,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		glm::inverse(sphere_tower_initial_translation)*
 		cannon_scaling*
 		cannon_initial_translation
-		
+
 		);
 
 	sphere_cannon.SetTransform(
@@ -217,12 +256,6 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	dynamite_fuse.SetTransform(
 		dynamite_fuse_initial_translation
 		);
-	dynamite_body2.SetTransform(
-		dynamite_body_initial_translation2
-		);
-	dynamite_fuse2.SetTransform(
-		dynamite_fuse_initial_translation
-		);
 
 
 	/******* RENDERING ******/
@@ -239,9 +272,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	scissor1.Render();
 	scissor2.Render();
 	dynamite_body.Render();
-	dynamite_body2.Render();
-	dynamite_fuse2.Render();
-	dynamite_fuse.Render();
+	if (dontcut){
+		dynamite_fuse.Render();
+	}
 
 
 	///******* CHECKING FOR COLLISIONS ******/
@@ -251,15 +284,15 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	//	else
 	//		movement_backward = false;
 	//}
-	std::cout << Collisions::OBBDetection(dynamite_fuse, cannon);
+	//std::cout << Collisions::OBBDetection(dynamite_fuse, cannon);
 	//
 	//std::cout << Collisions::OBBDetection(scissor1, dynamite_fuse);
 	//std::cout << Collisions::AABBDetection(body, dynamite_body);
 	//cannon.GetBB().print("cannon");
 	//dynamite_fuse.GetBB().print("fuse");
-	
-	
-	
+
+
+
 
 }
 

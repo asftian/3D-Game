@@ -18,7 +18,8 @@ tower_scaling_f(1.0),
 tower_scaling_up(1),
 tower_scaling_down(1),
 scissors_rotation_f(0.0),
-scissors_closed(0)
+scissors_closed(1),
+scissors_animation(0)
 {
 	GLFWInit();
 	GLEWInit();

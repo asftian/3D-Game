@@ -26,6 +26,7 @@ protected:
 	bool tower_scaling_down;
 	float scissors_rotation_f;
 	bool scissors_closed;
+	bool scissors_animation;
 
 	virtual void OnKeyW(bool down) {
 		key_pressed = 'w';
@@ -48,7 +49,7 @@ protected:
 		key_pressed = 'a';
 		
 		if (rotation_counter_clockwise == true)
-			cannon_rotation_f += glm::pi<float>() / 60.0;
+			cannon_rotation_f += glm::pi<float>() / 120.0;
 		//_LOG_INFO() << "A " << (down ? "down." : "up.") << std::endl;
 	}
 
@@ -56,7 +57,7 @@ protected:
 		key_pressed = 'd';
 		
 		if (rotation_clockwise == true)
-			cannon_rotation_f -= glm::pi<float>() / 60.0;
+			cannon_rotation_f -= glm::pi<float>() / 120.0;
 		//_LOG_INFO() << "D " << (down ? "down." : "up.") << std::endl;
 	}
 
@@ -101,17 +102,13 @@ protected:
 	virtual void OnKeyTAB(bool down) { _LOG_INFO() << "TAB " << (down ? "down." : "up.") << std::endl; }
 
 	virtual void OnKeySPACE(bool down) {
+		key_pressed = 'S';
 		if (down) {
-			key_pressed = ' ';
-			scissors_closed = true;
-			if (scissors_closed == true)
-				scissors_rotation_f = 1.0;
+			scissors_animation = true;
+				//scissors_rotation_f = 1.0;
 		}
 		else {
-			key_pressed = '\0';
-			scissors_closed = false;
-			if (scissors_closed == false)
-				scissors_rotation_f = 0.0;
+				//scissors_rotation_f = 0.0;
 		}
 		//_LOG_INFO() << "SPACE " << (down ? "down." : "up.") << std::endl;
 	}

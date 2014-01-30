@@ -34,8 +34,6 @@
 #include <cmath>
 #include "../vs12/glbase/vertexpositionnormal.h"
 
-
-
 // Utility Defines
 #define abstract = 0
 #define BAD_BUFFER UINT_MAX
