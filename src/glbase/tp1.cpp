@@ -8,7 +8,9 @@
 //-rajouter lanimation des sciseaux avec la touche correspondante
 //-implanter la dynamique de jeu
 //-
+int timeUnit = 0;
 bool temp = false;
+bool showCountdown = false;
 int skipframe = 0;
 float body_shear[16] = {
 	1, 0, 0, 0,
@@ -40,8 +42,8 @@ mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.6
 mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.0, 0.0));
 mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.11, 0.0, 0.25));
 mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.11, 0.0, -0.25));
-mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.0, 2));
-mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.4, 0.0));
+mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.8, 2));
+mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.05, 0.0));
 
 //ROTATION MATRIX
 mat4 cannon_initial_rotation = glm::rotate(glm::mat4(), glm::pi<float>() / 2.0f, glm::vec3(0, 0, 1));
@@ -63,7 +65,7 @@ cannon(0.05, 1.0, vec3(1.0, 164.0 / 255, 1.0), cannon_initial_rotation),
 sphere_cannon(0.05, vec3(1.0, 164.0 / 255, 1.0)),
 scissor1(vec3(0.3, 0.01, 0.090), vec3(0.0, 0.0, 1.0), scissors_initial_shear),
 scissor2(vec3(0.3, 0.01, 0.090), vec3(0.0, 0.0, 1.0), inverse(scissors_initial_shear)),
-dynamite_body(0.2, 2.4, vec3(1.0, 0.0, 0.0)),
+dynamite_body(0.2, 1.6, vec3(1.0, 0.0, 0.0)),
 dynamite_fuse(0.02, 0.5, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
 Core()
 {
@@ -91,211 +93,237 @@ Core()
 }
 
 void CoreTP1::Render(double dt) //dt is the time unit
-
-{
-	bool dontcut = true;
-	if (Collisions::AABBDetection(dynamite_fuse, sphere_cannon) ||
-		Collisions::AABBDetection(dynamite_body, body) ||
-		Collisions::OBBDetection(cannon, dynamite_fuse) ||
-		Collisions::OBBDetection(scissor1, dynamite_fuse) || 
-		Collisions::OBBDetection(scissor2, dynamite_fuse))
-	{
-		if (key_pressed == 'w'){
-			movement_forward = false;
-
+{	
+	if (timeUnit <= 5000){
+		if (timeUnit <=800 && !showCountdown)
+			DrawText("Get Ready!", vec2(0.03, 0.05));
+		else if (!showCountdown){
+			showCountdown = true;
+			timeUnit = 0;
 		}
-		else if (key_pressed == 's'){
-			movement_backward = false;
+		if (showCountdown){
+			if (timeUnit <= 1000)
+				DrawText("5", vec2(0.03, 0.05));
+			else if (timeUnit <= 2000)
+				DrawText("4", vec2(0.03, 0.05));
+			else if (timeUnit <= 3000)
+				DrawText("3", vec2(0.03, 0.05));
+			else if (timeUnit <= 4000)
+				DrawText("2", vec2(0.03, 0.05));
+			else if (timeUnit <= 5000)
+				DrawText("1", vec2(0.03, 0.05));
 		}
-
-		else if (key_pressed == 'r')
-			cannon_scaling_up = false;
-		else if (key_pressed == 'a'){
-			cannon_rotation_f -= glm::pi<float>() / 120.0;
-			rotation_counter_clockwise = false;
-		}
-
-		else if (key_pressed == 'd'){
-			rotation_clockwise = false;
-			cannon_rotation_f += glm::pi<float>() / 120.0;
-		}
-
-		else if (key_pressed == 'f')
-			cannon_scaling_down = false;
-		else if (key_pressed == 'q')
-			tower_scaling_down = false;
-		else if (key_pressed == 'e')
-			tower_scaling_up = false;
-
-	}
-	else{
-		movement_forward =
-			movement_backward =
-			cannon_scaling_up =
-			cannon_scaling_down =
-			tower_scaling_down =
-			tower_scaling_up =
-			rotation_clockwise =
-			rotation_counter_clockwise =
-			true;
-	}
-
-	
-
-
-
-	
-	if (scissors_animation){
 		
-		if (scissors_rotation_f < 1.1 && !descent){
-			if (skipframe<5){
-				
-				skipframe ++;
+	}
+	else {
+		bool dontcut = true;
+		if (Collisions::AABBDetection(dynamite_fuse, sphere_cannon) ||
+			Collisions::AABBDetection(dynamite_body, body) ||
+			Collisions::OBBDetection(cannon, dynamite_fuse) ||
+			Collisions::OBBDetection(scissor1, dynamite_fuse) ||
+			Collisions::OBBDetection(scissor2, dynamite_fuse))
+		{
+			if (key_pressed == 'w'){
+				movement_forward = false;
+
 			}
-			else {
-				if (Collisions::OBBDetection(scissor1, dynamite_fuse) || Collisions::OBBDetection(scissor2, dynamite_fuse)){
-					dontcut = false;
-				}
+			else if (key_pressed == 's'){
+				movement_backward = false;
 			}
-			
-			scissors_rotation_f += 0.02;
+
+			else if (key_pressed == 'r')
+				cannon_scaling_up = false;
+			else if (key_pressed == 'a'){
+				cannon_rotation_f -= glm::pi<float>() / 120.0;
+				rotation_counter_clockwise = false;
+			}
+
+			else if (key_pressed == 'd'){
+				rotation_clockwise = false;
+				cannon_rotation_f += glm::pi<float>() / 120.0;
+			}
+
+			else if (key_pressed == 'f')
+				cannon_scaling_down = false;
+			else if (key_pressed == 'q')
+				tower_scaling_down = false;
+			else if (key_pressed == 'e')
+				tower_scaling_up = false;
+
 		}
 		else{
-			descent = true;
-			scissors_rotation_f -= 0.02;
-			if (scissors_rotation_f <= 0){
-				scissors_animation = false;
-				descent = false;
-			}
+			movement_forward =
+				movement_backward =
+				cannon_scaling_up =
+				cannon_scaling_down =
+				tower_scaling_down =
+				tower_scaling_up =
+				rotation_clockwise =
+				rotation_counter_clockwise =
+				true;
 		}
-		if (!scissors_animation) skipframe = 0;
+
+
+
+
+
+
+		if (scissors_animation){
+
+			if (scissors_rotation_f < 1.1 && !descent){
+				if (skipframe < 5){
+
+					skipframe++;
+				}
+				else {
+					if (Collisions::OBBDetection(scissor1, dynamite_fuse) || Collisions::OBBDetection(scissor2, dynamite_fuse)){
+						dontcut = false;
+					}
+				}
+
+				scissors_rotation_f += 0.02;
+			}
+			else{
+				descent = true;
+				scissors_rotation_f -= 0.02;
+				if (scissors_rotation_f <= 0){
+					scissors_animation = false;
+					descent = false;
+				}
+			}
+			if (!scissors_animation) skipframe = 0;
+		}
+
+
+
+		/******* DYNAMIC MATRIX DEFINITIONS ******/
+		mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
+		mat4 cannon_rotation = glm::rotate(glm::mat4(), cannon_rotation_f, glm::vec3(0.0, 1.0, 0.0));
+		mat4 cannon_scaling = glm::scale(glm::mat4(), glm::vec3(cannon_scaling_f, 1.0, 1.0));
+		mat4 tower_scaling = glm::scale(glm::mat4(), glm::vec3(1.0, tower_scaling_f, 1.0));
+		mat4 scissor1_rotation = glm::rotate(glm::mat4(), scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
+		mat4 scissor2_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
+
+
+		/******* TRANSFORMATIONS SETTING ******/
+
+		body.SetTransform(
+			truck_movement*
+			body_initial_translation
+			);
+
+		wheel_fl.SetTransform(
+			glm::inverse(body_initial_translation)*
+			wheel_fl_initial_translation
+
+			);
+
+		wheel_fr.SetTransform(
+			glm::inverse(body_initial_translation)*
+			wheel_fr_initial_translation
+
+			);
+
+		wheel_rl.SetTransform(
+			glm::inverse(body_initial_translation)*
+			wheel_rl_initial_translation
+
+			);
+
+		wheel_rr.SetTransform(
+			glm::inverse(body_initial_translation)*
+			wheel_rr_initial_translation
+
+			);
+
+		tower.SetTransform(
+			tower_initial_translation1*
+			tower_scaling*
+			tower_initial_translation2
+			);
+
+		sphere_tower.SetTransform(
+
+			sphere_tower_initial_translation*
+			cannon_rotation*
+			glm::inverse(body_initial_translation)*
+			glm::inverse(tower_initial_translation1)*
+			glm::inverse(tower_initial_translation2)*
+			glm::inverse(tower_scaling)
+			);
+
+		cannon.SetTransform(
+			glm::inverse(sphere_tower_initial_translation)*
+			cannon_scaling*
+			cannon_initial_translation
+
+			);
+
+		sphere_cannon.SetTransform(
+			sphere_cannon_initial_translation*
+			glm::inverse(cannon_scaling)
+			);
+
+		scissor1.SetTransform(
+			scissor1_rotation*
+			scissor1_initial_translation*
+			scissor1_initial_rotation
+			);
+
+		scissor2.SetTransform(
+			scissor2_rotation*
+			scissor2_initial_translation*
+			scissor2_initial_rotation
+			);
+
+		dynamite_body.SetTransform(
+			dynamite_body_initial_translation
+			);
+
+		dynamite_fuse.SetTransform(
+			dynamite_fuse_initial_translation
+			);
+
+
+		/******* RENDERING ******/
+		plane.Render();
+		body.Render();
+		wheel_fl.Render();
+		wheel_fr.Render();
+		wheel_rl.Render();
+		wheel_rr.Render();
+		tower.Render();
+		sphere_tower.Render();
+		cannon.Render();
+		sphere_cannon.Render();
+		scissor1.Render();
+		scissor2.Render();
+		dynamite_body.Render();
+		if (dontcut){
+			dynamite_fuse.Render();
+		}
+
+
+		///******* CHECKING FOR COLLISIONS ******/
+		//if (Collisions::AABBDetection(body, dynamite_body)){
+		//	if (key_pressed = 'w')
+		//		movement_forward = false;
+		//	else
+		//		movement_backward = false;
+		//}
+		//std::cout << Collisions::OBBDetection(dynamite_fuse, cannon);
+		//
+		//std::cout << Collisions::OBBDetection(scissor1, dynamite_fuse);
+		//std::cout << Collisions::AABBDetection(body, dynamite_body);
+		//cannon.GetBB().print("cannon");
+		//dynamite_fuse.GetBB().print("fuse");
+
+		
+
+
+
 	}
-
-	/******* DYNAMIC MATRIX DEFINITIONS ******/
-	mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
-	mat4 cannon_rotation = glm::rotate(glm::mat4(), cannon_rotation_f, glm::vec3(0.0, 1.0, 0.0));
-	mat4 cannon_scaling = glm::scale(glm::mat4(), glm::vec3(cannon_scaling_f, 1.0, 1.0));
-	mat4 tower_scaling = glm::scale(glm::mat4(), glm::vec3(1.0, tower_scaling_f, 1.0));
-	mat4 scissor1_rotation = glm::rotate(glm::mat4(), scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
-	mat4 scissor2_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
-
-
-	/******* TRANSFORMATIONS SETTING ******/
-
-	body.SetTransform(
-		truck_movement*
-		body_initial_translation
-		);
-
-	wheel_fl.SetTransform(
-		glm::inverse(body_initial_translation)*
-		wheel_fl_initial_translation
-
-		);
-
-	wheel_fr.SetTransform(
-		glm::inverse(body_initial_translation)*
-		wheel_fr_initial_translation
-
-		);
-
-	wheel_rl.SetTransform(
-		glm::inverse(body_initial_translation)*
-		wheel_rl_initial_translation
-
-		);
-
-	wheel_rr.SetTransform(
-		glm::inverse(body_initial_translation)*
-		wheel_rr_initial_translation
-
-		);
-
-	tower.SetTransform(
-		tower_initial_translation1*
-		tower_scaling*
-		tower_initial_translation2
-		);
-
-	sphere_tower.SetTransform(
-
-		sphere_tower_initial_translation*
-		cannon_rotation*
-		glm::inverse(body_initial_translation)*
-		glm::inverse(tower_initial_translation1)*
-		glm::inverse(tower_initial_translation2)*
-		glm::inverse(tower_scaling)
-		);
-
-	cannon.SetTransform(
-		glm::inverse(sphere_tower_initial_translation)*
-		cannon_scaling*
-		cannon_initial_translation
-
-		);
-
-	sphere_cannon.SetTransform(
-		sphere_cannon_initial_translation*
-		glm::inverse(cannon_scaling)
-		);
-
-	scissor1.SetTransform(
-		scissor1_rotation*
-		scissor1_initial_translation*
-		scissor1_initial_rotation
-		);
-
-	scissor2.SetTransform(
-		scissor2_rotation*
-		scissor2_initial_translation*
-		scissor2_initial_rotation
-		);
-
-	dynamite_body.SetTransform(
-		dynamite_body_initial_translation
-		);
-
-	dynamite_fuse.SetTransform(
-		dynamite_fuse_initial_translation
-		);
-
-
-	/******* RENDERING ******/
-	plane.Render();
-	body.Render();
-	wheel_fl.Render();
-	wheel_fr.Render();
-	wheel_rl.Render();
-	wheel_rr.Render();
-	tower.Render();
-	sphere_tower.Render();
-	cannon.Render();
-	sphere_cannon.Render();
-	scissor1.Render();
-	scissor2.Render();
-	dynamite_body.Render();
-	if (dontcut){
-		dynamite_fuse.Render();
-	}
-
-
-	///******* CHECKING FOR COLLISIONS ******/
-	//if (Collisions::AABBDetection(body, dynamite_body)){
-	//	if (key_pressed = 'w')
-	//		movement_forward = false;
-	//	else
-	//		movement_backward = false;
-	//}
-	//std::cout << Collisions::OBBDetection(dynamite_fuse, cannon);
-	//
-	//std::cout << Collisions::OBBDetection(scissor1, dynamite_fuse);
-	//std::cout << Collisions::AABBDetection(body, dynamite_body);
-	//cannon.GetBB().print("cannon");
-	//dynamite_fuse.GetBB().print("fuse");
-
-
-
-
+	timeUnit++;
 }
 
 CoreTP1::~CoreTP1()

@@ -125,7 +125,7 @@ protected:
 		ALIGN_CENTER
 	};
 
-	void DrawText(const char* text, glm::vec2 position, const glm::vec4 &color = glm::vec4(1, 1, 1, 1), unsigned int pixel_size = 32, TextAlign align = ALIGN_LEFT);
+	void DrawText(const char* text, glm::vec2 position, const glm::vec4 &color = glm::vec4(0, 0, 0, 1), unsigned int pixel_size = 32, TextAlign align = ALIGN_LEFT);
 
 private:
 	void GLFWInit();
