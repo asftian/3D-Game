@@ -11,6 +11,10 @@
 int timeUnit = 0;
 bool temp = false;
 bool showCountdown = false;
+bool explosion_animation = false;
+bool dontexplode = true;
+float dynamite_explosion_rotation_f = 0.0f;
+float dynamite_explosion_scaling_f = 1.0f;
 int skipframe = 0;
 float body_shear[16] = {
 	1, 0, 0, 0,
@@ -46,7 +50,7 @@ mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.6
 mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.0, 0.0));
 mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.11, 0.0, 0.25));
 mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.11, 0.0, -0.25));
-mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.8, 2));
+mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(1.5, 0.8, 0.0));
 mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.05, 0.0));
 
 //ROTATION MATRIX
@@ -129,7 +133,7 @@ Core()
 }
 
 void CoreTP1::Render(double dt) //dt is the time unit
-{	
+{
 	if (timeUnit <= 5){
 	/*	if (timeUnit <=80 && !showCountdown)
 			DrawText("Get Ready!", vec2(0.5,0.5));
@@ -152,7 +156,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	}
 
 	else {
-		bool dontcut = true;
+
 		if (Collisions::AABBDetection(dynamite_fuse, sphere_cannon) ||
 			Collisions::AABBDetection(dynamite_body, body) ||
 			Collisions::OBBDetection(cannon, dynamite_fuse) ||
@@ -216,7 +220,8 @@ void CoreTP1::Render(double dt) //dt is the time unit
 				}
 				else {
 					if (Collisions::OBBDetection(scissor1, dynamite_fuse) || Collisions::OBBDetection(scissor2, dynamite_fuse)){
-						dontcut = false;
+						explosion_animation = true;
+
 					}
 				}
 
@@ -233,6 +238,18 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			if (!scissors_animation) skipframe = 0;
 		}
 
+		if (explosion_animation) {
+			if (dynamite_explosion_scaling_f > 0.03) {
+				dynamite_explosion_rotation_f += 0.2 * glm::pi<float>();
+				dynamite_explosion_scaling_f -= 0.03;
+			}
+			else {
+				explosion_animation = false;
+				dontexplode = false;
+				dynamite_explosion_rotation_f += 0.25;
+				dynamite_explosion_scaling_f = 1.0;
+			}
+		}
 
 
 		/******* DYNAMIC MATRIX DEFINITIONS ******/
@@ -258,6 +275,10 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		mat4 tower_scaling = glm::scale(glm::mat4(), glm::vec3(1.0, tower_scaling_f, 1.0));
 		mat4 scissor1_rotation = glm::rotate(glm::mat4(), scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 scissor2_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
+		mat4 dynamite_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
+		mat4 dynamite_explosion_rotation = glm::rotate(glm::mat4(), dynamite_explosion_rotation_f, glm::vec3(0.0, 0.0, 1.0));
+		mat4 dynamite_explosion_scaling = glm::scale(glm::mat4(), glm::vec3(dynamite_explosion_scaling_f, dynamite_explosion_scaling_f, dynamite_explosion_scaling_f));
+
 
 
 		/******* TRANSFORMATIONS SETTING ******/
@@ -388,7 +409,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			);
 
 		dynamite_body.SetTransform(
-			dynamite_body_initial_translation
+			dynamite_body_initial_translation*
+			dynamite_explosion_rotation*
+			dynamite_explosion_scaling
 			);
 
 		dynamite_fuse.SetTransform(
@@ -425,8 +448,8 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		sphere_cannon.Render();
 		scissor1.Render();
 		scissor2.Render();
-		dynamite_body.Render();
-		if (dontcut){
+		if (dontexplode) {
+			dynamite_body.Render();
 			dynamite_fuse.Render();
 		}
 
