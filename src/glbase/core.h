@@ -105,10 +105,6 @@ protected:
 		key_pressed = 'S';
 		if (down) {
 			scissors_animation = true;
-				//scissors_rotation_f = 1.0;
-		}
-		else {
-				//scissors_rotation_f = 0.0;
 		}
 		//_LOG_INFO() << "SPACE " << (down ? "down." : "up.") << std::endl;
 	}

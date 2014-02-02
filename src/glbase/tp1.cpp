@@ -11,6 +11,10 @@
 int timeUnit = 0;
 bool temp = false;
 bool showCountdown = false;
+bool explosion_animation = false;
+bool dontexplode = true;
+float dynamite_explosion_rotation_f = 0.0f;
+float dynamite_explosion_scaling_f = 1.0f;
 int skipframe = 0;
 float body_shear[16] = {
 	1, 0, 0, 0,
@@ -31,10 +35,14 @@ mat4 scissors_initial_shear = glm::make_mat4(scissors_shear);
 
 //TRANSLATION MATRIX
 mat4 body_initial_translation = (glm::translate(glm::mat4(), glm::vec3(0.0, 0.6, 0.0)));
-mat4 wheel_fl_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.3, 0.55));
-mat4 wheel_fr_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.3, -0.55));
-mat4 wheel_rl_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.4, 0.3, 0.55));
-mat4 wheel_rr_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.4, 0.3, -0.55));
+mat4 wheel_fl_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.31, 0.55));
+mat4 wheel_fr_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.31, -0.55));
+mat4 wheel_rl_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.4, 0.31, 0.55));
+mat4 wheel_rr_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.4, 0.31, -0.55));
+mat4 wheel_box1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 0.2, 0.0));
+mat4 wheel_box2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.2, 0.0, 0.0));
+mat4 wheel_box3_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, -0.2, 0.0));
+mat4 wheel_box4_initial_translation = glm::translate(glm::mat4(), glm::vec3(-0.2, 0.0, 0.0));
 mat4 tower_initial_translation1 = glm::translate(glm::mat4(), glm::vec3(0, 0.35, 0));
 mat4 tower_initial_translation2 = glm::translate(glm::mat4(), glm::vec3(0, 0.35, 0));
 mat4 sphere_tower_initial_translation = glm::translate(glm::mat4(), glm::vec3(0, 1.6, 0));
@@ -42,7 +50,7 @@ mat4 cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 1.6
 mat4 sphere_cannon_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.0, 0.0));
 mat4 scissor1_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.11, 0.0, 0.25));
 mat4 scissor2_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.11, 0.0, -0.25));
-mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(-2, 0.8, 2));
+mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(1.5, 0.8, 0.0));
 mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.05, 0.0));
 
 //ROTATION MATRIX
@@ -56,9 +64,25 @@ CoreTP1::CoreTP1() :
 plane(vec3(8.0, 0.1, 6.0), vec3(1.0, 132.0 / 255, 132.0 / 255)),
 body(vec3(1.5, 0.7, 1.0), vec3(0.0, 217.0 / 255, 38.0 / 255), body_initial_shear),
 wheel_fl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255), wheels_initial_rotation),
+wheel_fl_box1(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_fl_box2(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_fl_box3(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_fl_box4(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_fr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255), wheels_initial_rotation),
+wheel_fr_box1(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_fr_box2(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_fr_box3(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_fr_box4(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_rl(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255), wheels_initial_rotation),
+wheel_rl_box1(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_rl_box2(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_rl_box3(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_rl_box4(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 wheel_rr(0.18, 0.1, vec3(48.0 / 255, 48.0 / 255, 48.0 / 255), wheels_initial_rotation),
+wheel_rr_box1(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_rr_box2(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_rr_box3(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
+wheel_rr_box4(vec3(0.1, 0.1, 0.1), vec3(48.0 / 255, 48.0 / 255, 48.0 / 255)),
 tower(0.08, 0.7, vec3(1.0, 164.0 / 255, 1.0)),
 sphere_tower(0.14, vec3(1.0, 164.0 / 255, 1.0)),
 cannon(0.05, 1.0, vec3(1.0, 164.0 / 255, 1.0), cannon_initial_rotation),
@@ -72,9 +96,25 @@ Core()
 
 	/******* BABY MAKING ******/
 	body.AddChild(&wheel_fl);
+	wheel_fl.AddChild(&wheel_fl_box1);
+	wheel_fl.AddChild(&wheel_fl_box2);
+	wheel_fl.AddChild(&wheel_fl_box3);
+	wheel_fl.AddChild(&wheel_fl_box4);
 	body.AddChild(&wheel_fr);
+	wheel_fr.AddChild(&wheel_fr_box1);
+	wheel_fr.AddChild(&wheel_fr_box2);
+	wheel_fr.AddChild(&wheel_fr_box3);
+	wheel_fr.AddChild(&wheel_fr_box4);
 	body.AddChild(&wheel_rl);
+	wheel_rl.AddChild(&wheel_rl_box1);
+	wheel_rl.AddChild(&wheel_rl_box2);
+	wheel_rl.AddChild(&wheel_rl_box3);
+	wheel_rl.AddChild(&wheel_rl_box4);
 	body.AddChild(&wheel_rr);
+	wheel_rr.AddChild(&wheel_rr_box1);
+	wheel_rr.AddChild(&wheel_rr_box2);
+	wheel_rr.AddChild(&wheel_rr_box3);
+	wheel_rr.AddChild(&wheel_rr_box4);
 	body.AddChild(&tower);
 	tower.AddChild(&sphere_tower);
 	sphere_tower.AddChild(&cannon);
@@ -93,30 +133,30 @@ Core()
 }
 
 void CoreTP1::Render(double dt) //dt is the time unit
-{	
-	if (timeUnit <= 5000){
-		if (timeUnit <=800 && !showCountdown)
+{
+	if (timeUnit <= 5){
+	/*	if (timeUnit <=80 && !showCountdown)
 			DrawText("Get Ready!", vec2(0.5,0.5));
 		else if (!showCountdown){
 			showCountdown = true;
 			timeUnit = 0;
 		}
 		if (showCountdown){
-			if (timeUnit <= 1000)
+			if (timeUnit <= 100)
 				DrawText("5", vec2(0.5, 0.5));
-			else if (timeUnit <= 2000)
+			else if (timeUnit <= 200)
 				DrawText("4", vec2(0.5, 0.5));
-			else if (timeUnit <= 3000)
+			else if (timeUnit <= 300)
 				DrawText("3", vec2(0.5, 0.5));
-			else if (timeUnit <= 4000)
+			else if (timeUnit <= 400)
 				DrawText("2", vec2(0.5, 0.5));
-			else if (timeUnit <= 5000)
+			else if (timeUnit <= 500)
 				DrawText("1", vec2(0.5, 0.5));
-		}
-		
+		}*/
 	}
+
 	else {
-		bool dontcut = true;
+
 		if (Collisions::AABBDetection(dynamite_fuse, sphere_cannon) ||
 			Collisions::AABBDetection(dynamite_body, body) ||
 			Collisions::OBBDetection(cannon, dynamite_fuse) ||
@@ -176,7 +216,8 @@ void CoreTP1::Render(double dt) //dt is the time unit
 				}
 				else {
 					if (Collisions::OBBDetection(scissor1, dynamite_fuse) || Collisions::OBBDetection(scissor2, dynamite_fuse)){
-						dontcut = false;
+						explosion_animation = true;
+
 					}
 				}
 
@@ -193,6 +234,18 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			if (!scissors_animation) skipframe = 0;
 		}
 
+		if (explosion_animation) {
+			if (dynamite_explosion_scaling_f > 0.03) {
+				dynamite_explosion_rotation_f += 0.2 * glm::pi<float>();
+				dynamite_explosion_scaling_f -= 0.03;
+			}
+			else {
+				explosion_animation = false;
+				dontexplode = false;
+				dynamite_explosion_rotation_f += 0.25;
+				dynamite_explosion_scaling_f = 1.0;
+			}
+		}
 
 
 		/******* DYNAMIC MATRIX DEFINITIONS ******/
@@ -208,12 +261,20 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			tower_scaling_f = 2;
 		if (tower_scaling_f <= 0.1)
 			tower_scaling_f = 0.1;
+
+		float wheel_rotation_f = -(truck_movement_f / (2.0f * glm::pi<float>() * 0.18f)) * 2 * glm::pi<float>();
+
 		mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
+		mat4 wheel_rotation = glm::rotate(glm::mat4(), wheel_rotation_f, glm::vec3(0.0, 0.0, 1.0));
 		mat4 cannon_rotation = glm::rotate(glm::mat4(), cannon_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 cannon_scaling = glm::scale(glm::mat4(), glm::vec3(cannon_scaling_f, 1.0, 1.0));
 		mat4 tower_scaling = glm::scale(glm::mat4(), glm::vec3(1.0, tower_scaling_f, 1.0));
 		mat4 scissor1_rotation = glm::rotate(glm::mat4(), scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 scissor2_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
+		mat4 dynamite_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
+		mat4 dynamite_explosion_rotation = glm::rotate(glm::mat4(), dynamite_explosion_rotation_f, glm::vec3(0.0, 0.0, 1.0));
+		mat4 dynamite_explosion_scaling = glm::scale(glm::mat4(), glm::vec3(dynamite_explosion_scaling_f, dynamite_explosion_scaling_f, dynamite_explosion_scaling_f));
+
 
 
 		/******* TRANSFORMATIONS SETTING ******/
@@ -224,27 +285,83 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			);
 
 		wheel_fl.SetTransform(
-			glm::inverse(body_initial_translation)*
-			wheel_fl_initial_translation
+			glm::inverse(body_initial_translation)*		
+			wheel_fl_initial_translation*
+			wheel_rotation
+			);
 
+		wheel_fl_box1.SetTransform(
+			wheel_box1_initial_translation
+			);
+
+		wheel_fl_box2.SetTransform(
+			wheel_box2_initial_translation
+			);
+		wheel_fl_box3.SetTransform(
+			wheel_box3_initial_translation
+			);
+		wheel_fl_box4.SetTransform(
+			wheel_box4_initial_translation
 			);
 
 		wheel_fr.SetTransform(
-			glm::inverse(body_initial_translation)*
-			wheel_fr_initial_translation
+			glm::inverse(body_initial_translation)*			
+			wheel_fr_initial_translation*
+			wheel_rotation
+			);
 
+		wheel_fr_box1.SetTransform(
+			wheel_box1_initial_translation
+			);
+
+		wheel_fr_box2.SetTransform(
+			wheel_box2_initial_translation
+			);
+		wheel_fr_box3.SetTransform(
+			wheel_box3_initial_translation
+			);
+		wheel_fr_box4.SetTransform(
+			wheel_box4_initial_translation
 			);
 
 		wheel_rl.SetTransform(
-			glm::inverse(body_initial_translation)*
-			wheel_rl_initial_translation
+			glm::inverse(body_initial_translation)*		
+			wheel_rl_initial_translation*
+			wheel_rotation
+			);
 
+		wheel_rl_box1.SetTransform(
+			wheel_box1_initial_translation
+			);
+
+		wheel_rl_box2.SetTransform(
+			wheel_box2_initial_translation
+			);
+		wheel_rl_box3.SetTransform(
+			wheel_box3_initial_translation
+			);
+		wheel_rl_box4.SetTransform(
+			wheel_box4_initial_translation
 			);
 
 		wheel_rr.SetTransform(
-			glm::inverse(body_initial_translation)*
-			wheel_rr_initial_translation
+			glm::inverse(body_initial_translation)*	
+			wheel_rr_initial_translation*
+			wheel_rotation
+			);
 
+		wheel_rr_box1.SetTransform(
+			wheel_box1_initial_translation
+			);
+
+		wheel_rr_box2.SetTransform(
+			wheel_box2_initial_translation
+			);
+		wheel_rr_box3.SetTransform(
+			wheel_box3_initial_translation
+			);
+		wheel_rr_box4.SetTransform(
+			wheel_box4_initial_translation
 			);
 
 		tower.SetTransform(
@@ -288,7 +405,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			);
 
 		dynamite_body.SetTransform(
-			dynamite_body_initial_translation
+			dynamite_body_initial_translation*
+			dynamite_explosion_rotation*
+			dynamite_explosion_scaling
 			);
 
 		dynamite_fuse.SetTransform(
@@ -300,38 +419,35 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		plane.Render();
 		body.Render();
 		wheel_fl.Render();
+		wheel_fl_box1.Render();
+		wheel_fl_box2.Render();
+		wheel_fl_box3.Render();
+		wheel_fl_box4.Render();
 		wheel_fr.Render();
+		wheel_fr_box1.Render();
+		wheel_fr_box2.Render();
+		wheel_fr_box3.Render();
+		wheel_fr_box4.Render();
 		wheel_rl.Render();
+		wheel_rl_box1.Render();
+		wheel_rl_box2.Render();
+		wheel_rl_box3.Render();
+		wheel_rl_box4.Render();
 		wheel_rr.Render();
+		wheel_rr_box1.Render();
+		wheel_rr_box2.Render();
+		wheel_rr_box3.Render();
+		wheel_rr_box4.Render();
 		tower.Render();
 		sphere_tower.Render();
 		cannon.Render();
 		sphere_cannon.Render();
 		scissor1.Render();
 		scissor2.Render();
-		dynamite_body.Render();
-		if (dontcut){
+		if (dontexplode) {
+			dynamite_body.Render();
 			dynamite_fuse.Render();
 		}
-
-
-		///******* CHECKING FOR COLLISIONS ******/
-		//if (Collisions::AABBDetection(body, dynamite_body)){
-		//	if (key_pressed = 'w')
-		//		movement_forward = false;
-		//	else
-		//		movement_backward = false;
-		//}
-		//std::cout << Collisions::OBBDetection(dynamite_fuse, cannon);
-		//
-		//std::cout << Collisions::OBBDetection(scissor1, dynamite_fuse);
-		//std::cout << Collisions::AABBDetection(body, dynamite_body);
-		//cannon.GetBB().print("cannon");
-		//dynamite_fuse.GetBB().print("fuse");
-
-		
-
-
 
 	}
 	timeUnit++;
