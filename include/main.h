@@ -24,6 +24,8 @@
 #include <climits>
 #include <vector>
 #include <memory>
+#include <cstdlib>
+#include <ctime>
 #pragma warning(pop)
 
 // Additional Includes

@@ -13,9 +13,14 @@ public:
 
 protected:
 	virtual void Render(double dt) override;
+	void ScissorsAnimation(int i);
+	void ExplosionAnimation(int i);
+	void CheckCollisions(int i);
 
 	Box plane;
 	Box body;
+	float dynamite_position;
+	int random;
 	Cylinder wheel_fl;
 	Box wheel_fl_box1;
 	Box wheel_fl_box2;
@@ -42,8 +47,14 @@ protected:
 	Sphere sphere_cannon;
 	Box scissor1;
 	Box scissor2;	
-	Cylinder dynamite_body;
-	Cylinder dynamite_fuse;
+	float posX;
+	float posZ;
+	float height;
+	float fuse_height;
+	std::vector<Cylinder> dynamites;
+	std::vector<mat4> dynamites_transformations;
+	std::vector<mat4> fuses_transformations;
+	std::vector<Cylinder> fuses;
 
 	std::vector<Node> nodes;	
 };
