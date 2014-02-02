@@ -128,31 +128,27 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		{
 			if (key_pressed == 'w'){
 				movement_forward = false;
-
 			}
 			else if (key_pressed == 's'){
 				movement_backward = false;
 			}
-
 			else if (key_pressed == 'r')
 				cannon_scaling_up = false;
 			else if (key_pressed == 'a'){
-				cannon_rotation_f -= glm::pi<float>() / 120.0;
+				//cannon_rotation_f -= glm::pi<float>() / 120.0;
 				rotation_counter_clockwise = false;
 			}
-
 			else if (key_pressed == 'd'){
 				rotation_clockwise = false;
-				cannon_rotation_f += glm::pi<float>() / 120.0;
+				//cannon_rotation_f += glm::pi<float>() / 120.0;
 			}
-
 			else if (key_pressed == 'f')
 				cannon_scaling_down = false;
 			else if (key_pressed == 'q')
 				tower_scaling_down = false;
 			else if (key_pressed == 'e')
 				tower_scaling_up = false;
-
+			
 		}
 		else{
 			movement_forward =
