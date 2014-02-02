@@ -248,7 +248,11 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			tower_scaling_f = 2;
 		if (tower_scaling_f <= 0.1)
 			tower_scaling_f = 0.1;
+
+		float wheel_rotation_f = -(truck_movement_f / (2.0f * glm::pi<float>() * 0.18f)) * 2 * glm::pi<float>();
+
 		mat4 truck_movement = glm::translate(glm::mat4(), glm::vec3(truck_movement_f, 0.0, 0.0));
+		mat4 wheel_rotation = glm::rotate(glm::mat4(), wheel_rotation_f, glm::vec3(0.0, 0.0, 1.0));
 		mat4 cannon_rotation = glm::rotate(glm::mat4(), cannon_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 cannon_scaling = glm::scale(glm::mat4(), glm::vec3(cannon_scaling_f, 1.0, 1.0));
 		mat4 tower_scaling = glm::scale(glm::mat4(), glm::vec3(1.0, tower_scaling_f, 1.0));
@@ -264,8 +268,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			);
 
 		wheel_fl.SetTransform(
-			glm::inverse(body_initial_translation)*
-			wheel_fl_initial_translation
+			glm::inverse(body_initial_translation)*		
+			wheel_fl_initial_translation*
+			wheel_rotation
 			);
 
 		wheel_fl_box1.SetTransform(
@@ -283,8 +288,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			);
 
 		wheel_fr.SetTransform(
-			glm::inverse(body_initial_translation)*
-			wheel_fr_initial_translation
+			glm::inverse(body_initial_translation)*			
+			wheel_fr_initial_translation*
+			wheel_rotation
 			);
 
 		wheel_fr_box1.SetTransform(
@@ -302,8 +308,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			);
 
 		wheel_rl.SetTransform(
-			glm::inverse(body_initial_translation)*
-			wheel_rl_initial_translation
+			glm::inverse(body_initial_translation)*		
+			wheel_rl_initial_translation*
+			wheel_rotation
 			);
 
 		wheel_rl_box1.SetTransform(
@@ -321,8 +328,9 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			);
 
 		wheel_rr.SetTransform(
-			glm::inverse(body_initial_translation)*
-			wheel_rr_initial_translation
+			glm::inverse(body_initial_translation)*	
+			wheel_rr_initial_translation*
+			wheel_rotation
 			);
 
 		wheel_rr_box1.SetTransform(
@@ -421,25 +429,6 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		if (dontcut){
 			dynamite_fuse.Render();
 		}
-
-
-		///******* CHECKING FOR COLLISIONS ******/
-		//if (Collisions::AABBDetection(body, dynamite_body)){
-		//	if (key_pressed = 'w')
-		//		movement_forward = false;
-		//	else
-		//		movement_backward = false;
-		//}
-		//std::cout << Collisions::OBBDetection(dynamite_fuse, cannon);
-		//
-		//std::cout << Collisions::OBBDetection(scissor1, dynamite_fuse);
-		//std::cout << Collisions::AABBDetection(body, dynamite_body);
-		//cannon.GetBB().print("cannon");
-		//dynamite_fuse.GetBB().print("fuse");
-
-		
-
-
 
 	}
 	timeUnit++;
