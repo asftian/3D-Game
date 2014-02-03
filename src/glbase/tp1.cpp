@@ -190,7 +190,7 @@ void CoreTP1::Render(double dt)
 		mat4 tower_scaling = glm::scale(glm::mat4(), glm::vec3(1.0, tower_scaling_f, 1.0));
 		mat4 scissor1_rotation = glm::rotate(glm::mat4(), scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 scissor2_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
-		mat4 dynamite_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
+		mat4 dynamite_rotdation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 
 		for (unsigned int i = 0; i < dynamites.size(); i++){
 			dynamites.at(i).explosion_rotation = glm::rotate(glm::mat4(), dynamites.at(i).dynamite_explosion_rotation_f, glm::vec3(0.0, 0.0, 1.0));
@@ -356,7 +356,7 @@ void CoreTP1::Render(double dt)
 		scissor1.Render();
 		scissor2.Render();
 		if (createDynamite){
-			for (int i = 0; i < 100; i++){
+			for (int i = 0; i < 10; i++){
 				Dynamite dynamite(
 					RandomNumber(-3.8, 3.8),
 					RandomNumber(-2.8, 2.8),
@@ -365,7 +365,6 @@ void CoreTP1::Render(double dt)
 				dynamites.push_back(dynamite);
 			}
 			createDynamite = false;
-
 		}
 		for (unsigned int i = 0; i < dynamites.size(); i++){
 			dynamites.at(i).body.AddChild(&dynamites.at(i).fuse);
@@ -392,10 +391,8 @@ void CoreTP1::Render(double dt)
 					}
 					else {
 						dynamites.at(i).d_to_d_collision_check = true;
-						
 					}
 				}
-				
 			}
 
 			if (generateNew || (Collisions::OBBDetection(dynamites.at(i).body, body) &&
@@ -423,11 +420,13 @@ void CoreTP1::ScissorsAnimation(){
 			}
 			else {
 				for (unsigned int i = 0; i < dynamites.size(); i++){
-					if (Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
-						Collisions::OBBDetection(scissor2, dynamites.at(i).fuse)){
+					if (dynamites.at(i).show && (Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
+						Collisions::OBBDetection(scissor2, dynamites.at(i).fuse))){
 						dynamites.at(i).show = false;
 					}
 				}
+				
+					
 			}
 			scissors_rotation_f += 0.02;
 		}
@@ -462,12 +461,12 @@ void CoreTP1::ExplosionAnimation(){
 void CoreTP1::CheckCollisions(int number_of_dynamites){
 	bool no_collision = true;
 	for (int i = 0; i < number_of_dynamites; i++){
-		if (Collisions::AABBDetection(dynamites.at(i).fuse, sphere_cannon) ||
+		if (dynamites.at(i).show && (Collisions::AABBDetection(dynamites.at(i).fuse, sphere_cannon) ||
 			Collisions::AABBDetection(dynamites.at(i).body, body) ||
 			Collisions::OBBDetection(cannon, dynamites.at(i).body) ||
 			Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
 			Collisions::OBBDetection(scissor2, dynamites.at(i).fuse) ||
-			Collisions::OBBDetection(cannon, dynamites.at(i).body))
+			Collisions::OBBDetection(cannon, dynamites.at(i).body)))
 		{
 			no_collision = false;
 			if (key_pressed == 'w'){
