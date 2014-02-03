@@ -13,6 +13,7 @@ bool temp = false;
 bool showCountdown = false;
 bool explosion_animation = false;
 bool showDynamite = true;
+bool createDynamite = true;
 float dynamite_explosion_rotation_f = 0.0f;
 float dynamite_explosion_scaling_f = 1.0f;
 int skipframe = 0;
@@ -96,7 +97,7 @@ scissor1(vec3(0.3, 0.01, 0.090), vec3(0.0, 0.0, 1.0), scissors_initial_shear),
 scissor2(vec3(0.3, 0.01, 0.090), vec3(0.0, 0.0, 1.0), inverse(scissors_initial_shear)),
 Core()
 {
-	
+
 
 	/******* BABY MAKING ******/
 	body.AddChild(&wheel_fl);
@@ -130,7 +131,6 @@ Core()
 	int random = 0;
 
 	/******* STATIC MATRIX DEFINITIONS ******/
-
 	//VIEW MATRIX
 	//Positionnement de la camera.
 	//TODO
@@ -142,56 +142,34 @@ Core()
 void CoreTP1::Render(double dt) //dt is the time unit
 {
 	if (timeUnit <= 5){
-	/*	if (timeUnit <=80 && !showCountdown)
-			DrawText("Get Ready!", vec2(0.5,0.5));
-		else if (!showCountdown){
-			showCountdown = true;
-			timeUnit = 0;
-		}
-		if (showCountdown){
-			if (timeUnit <= 100)
+		/*	if (timeUnit <=80 && !showCountdown)
+				DrawText("Get Ready!", vec2(0.5,0.5));
+				else if (!showCountdown){
+				showCountdown = true;
+				timeUnit = 0;
+				}
+				if (showCountdown){
+				if (timeUnit <= 100)
 				DrawText("5", vec2(0.5, 0.5));
-			else if (timeUnit <= 200)
+				else if (timeUnit <= 200)
 				DrawText("4", vec2(0.5, 0.5));
-			else if (timeUnit <= 300)
+				else if (timeUnit <= 300)
 				DrawText("3", vec2(0.5, 0.5));
-			else if (timeUnit <= 400)
+				else if (timeUnit <= 400)
 				DrawText("2", vec2(0.5, 0.5));
-			else if (timeUnit <= 500)
+				else if (timeUnit <= 500)
 				DrawText("1", vec2(0.5, 0.5));
-		}*/
+				}*/
 	}
 
 	else {
-		
-		if (random<=2){
-			posX = RandomNumber(-3.8, 3.8);
-			std::cout << posX << "\n";
-			posZ = RandomNumber(-2.8, 2.8);
-			height = RandomNumber(1.4,2.2);
-			fuse_height = RandomNumber(0.3, 0.9);
-			Cylinder dynamite_body(0.2, height, vec3(1.0, 0.0, 0.0));
-			Cylinder dynamite_fuse(0.02, fuse_height, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255));
-			dynamite_body.AddChild(&dynamite_fuse);
-			dynamites.push_back(dynamite_body);
-			fuses.push_back(dynamite_fuse);
-			mat4 dynamite_body_initial_translation = glm::translate(glm::mat4(), glm::vec3(posX, 0.8, posZ));
-			mat4 dynamite_fuse_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.0, 1.05, 0.0));
-			dynamites_transformations.push_back(dynamite_body_initial_translation);
-			fuses_transformations.push_back(dynamite_fuse_initial_translation);
-			random++;
-		}
-		
+
+
 		for (int i = 0; i < dynamites.size(); i++){
-			
 			ScissorsAnimation(i);
 			ExplosionAnimation(i);
 		}
 		CheckCollisions(dynamites.size());
-		
-		
-		
-
 
 		/******* DYNAMIC MATRIX DEFINITIONS ******/
 		if (truck_movement_f >= 3.0)
@@ -219,9 +197,6 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		mat4 dynamite_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 dynamite_explosion_rotation = glm::rotate(glm::mat4(), dynamite_explosion_rotation_f, glm::vec3(0.0, 0.0, 1.0));
 		mat4 dynamite_explosion_scaling = glm::scale(glm::mat4(), glm::vec3(dynamite_explosion_scaling_f, dynamite_explosion_scaling_f, dynamite_explosion_scaling_f));
-		
-
-
 
 		/******* TRANSFORMATIONS SETTING ******/
 
@@ -349,22 +324,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			scissor2_initial_translation*
 			scissor2_initial_rotation
 			);
-		for (int i = 0; i < dynamites.size(); i++){
-			dynamites.at(i).AddChild(&fuses.at(i));
-			dynamites.at(i).SetTransform(
-				dynamites_transformations.at(i)*
-				dynamite_explosion_rotation*
-				dynamite_explosion_scaling
-				);
-			fuses.at(i).SetTransform(
-				fuses_transformations.at(i)
-				);
-			if (showDynamite) {
-				fuses.at(i).Render();
-				dynamites.at(i).Render();
-				
-			}
-		}
+
 
 		/******* RENDERING ******/
 		plane.Render();
@@ -395,6 +355,45 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		sphere_cannon.Render();
 		scissor1.Render();
 		scissor2.Render();
+		if (createDynamite){
+			for (int i = 0; i < 100; i++){
+				Dynamite dynamite(
+					RandomNumber(-3.8, 3.8),
+					RandomNumber(-2.8, 2.8),
+					RandomNumber(1.4, 2.2),
+					RandomNumber(0.3, 0.9));
+				dynamites.push_back(dynamite);
+			}
+			createDynamite = false;
+
+		}
+		for (int i = 0; i < dynamites.size(); i++){
+			dynamites.at(i).body.AddChild(&dynamites.at(i).fuse);
+			dynamites.at(i).body.SetTransform(
+				dynamites.at(i).body_translation*
+				dynamite_explosion_rotation*
+				dynamite_explosion_scaling
+				);
+			dynamites.at(i).fuse.SetTransform(
+				dynamites.at(i).fuse_translation
+				);
+
+			if (showDynamite) {
+				dynamites.at(i).body.Render();
+				dynamites.at(i).fuse.Render();
+			}
+			if (Collisions::OBBDetection(dynamites.at(i).body, body) &&
+				dynamites.at(i).initialization == true){
+				dynamites.at(i) = Dynamite(RandomNumber(-3.8, 3.8),
+					RandomNumber(-2.8, 2.8),
+					RandomNumber(1.4, 2.2),
+					RandomNumber(0.3, 0.9));
+			}
+			else {
+				dynamites.at(i).initialization = false;
+			}
+			
+		}
 	}
 	timeUnit++;
 }
@@ -406,7 +405,8 @@ void CoreTP1::ScissorsAnimation(int i){
 				skipframe++;
 			}
 			else {
-				if (Collisions::OBBDetection(scissor1, fuses.at(i)) || Collisions::OBBDetection(scissor2, fuses.at(i))){
+				if (Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
+					Collisions::OBBDetection(scissor2, dynamites.at(i).fuse)){
 					explosion_animation = true;
 				}
 			}
@@ -423,7 +423,6 @@ void CoreTP1::ScissorsAnimation(int i){
 		if (!scissors_animation) skipframe = 0;
 	}
 }
-
 void CoreTP1::ExplosionAnimation(int i){
 	if (explosion_animation) {
 		if (dynamite_explosion_scaling_f > 0.03) {
@@ -438,17 +437,16 @@ void CoreTP1::ExplosionAnimation(int i){
 		}
 	}
 }
-
-void CoreTP1::CheckCollisions(int x){
+void CoreTP1::CheckCollisions(int number_of_dynamites){
 	bool no_collision = true;
-	for (int i = 0; i < x; i++){
-		if (Collisions::AABBDetection(fuses.at(i), sphere_cannon) ||
-			Collisions::AABBDetection(dynamites.at(i), body) ||
-			Collisions::OBBDetection(cannon, fuses.at(i)) ||
-			Collisions::OBBDetection(scissor1, fuses.at(i)) ||
-			Collisions::OBBDetection(scissor2, fuses.at(i)) ||
-			Collisions::OBBDetection(cannon, dynamites.at(i)))
-		{		
+	for (int i = 0; i < number_of_dynamites; i++){
+		if (Collisions::AABBDetection(dynamites.at(i).fuse, sphere_cannon) ||
+			Collisions::AABBDetection(dynamites.at(i).body, body) ||
+			Collisions::OBBDetection(cannon, dynamites.at(i).body) ||
+			Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
+			Collisions::OBBDetection(scissor2, dynamites.at(i).fuse) ||
+			Collisions::OBBDetection(cannon, dynamites.at(i).body))
+		{
 			no_collision = false;
 			if (key_pressed == 'w'){
 				movement_forward = false;
@@ -471,7 +469,7 @@ void CoreTP1::CheckCollisions(int x){
 			else if (key_pressed == 'e')
 				tower_scaling_up = false;
 		}
-	} 
+	}
 	if (no_collision){
 		movement_forward =
 			movement_backward =
@@ -484,7 +482,6 @@ void CoreTP1::CheckCollisions(int x){
 			true;
 	}
 }
-
 
 CoreTP1::~CoreTP1()
 {

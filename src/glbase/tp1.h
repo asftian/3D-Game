@@ -4,6 +4,28 @@
 #include "scene.h"
 #include "collisions.h"
 
+float RandomNumber(float Min, float Max);
+struct Dynamite{
+	Dynamite(float x, float z, float height, float fuse_length):
+	fuse(0.02, fuse_length, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
+	body(0.2, height, vec3(1.0, 0.0, 0.0)),
+	body_translation(translate(glm::mat4(), glm::vec3(x, height/2 , z))),
+	fuse_translation(translate(glm::mat4(), glm::vec3(0.0, height/2+fuse_length/2, 0.0)))
+	{
+		body.AddChild(&fuse);
+		initialization = true;
+	}
+	Cylinder body;
+	Cylinder fuse;
+	bool initialization;
+	float x;
+	float z;
+	float height;
+	float fuse_length;
+	mat4 body_translation;
+	mat4 fuse_translation;
+};
+
 class CoreTP1 : public Core
 {
 public:
@@ -51,11 +73,7 @@ protected:
 	float posZ;
 	float height;
 	float fuse_height;
-	std::vector<Cylinder> dynamites;
-	std::vector<mat4> dynamites_transformations;
-	std::vector<mat4> fuses_transformations;
-	std::vector<Cylinder> fuses;
-
+	std::vector<Dynamite> dynamites;
 	std::vector<Node> nodes;	
 };
 
