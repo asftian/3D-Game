@@ -49,7 +49,7 @@ protected:
 		key_pressed = 'a';
 		
 		if (rotation_counter_clockwise == true)
-			cannon_rotation_f += glm::pi<float>() / 120.0;
+			cannon_rotation_f += glm::pi<double>() / 120.0;
 		//_LOG_INFO() << "A " << (down ? "down." : "up.") << std::endl;
 	}
 
@@ -57,7 +57,7 @@ protected:
 		key_pressed = 'd';
 		
 		if (rotation_clockwise == true)
-			cannon_rotation_f -= glm::pi<float>() / 120.0;
+			cannon_rotation_f -= glm::pi<double>() / 120.0;
 		//_LOG_INFO() << "D " << (down ? "down." : "up.") << std::endl;
 	}
 

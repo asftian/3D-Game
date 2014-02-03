@@ -5,6 +5,7 @@
 #include "collisions.h"
 
 float RandomNumber(float Min, float Max);
+
 struct Dynamite{
 	Dynamite(float x, float z, float height, float fuse_length):
 	fuse(0.02, fuse_length, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
@@ -14,14 +15,14 @@ struct Dynamite{
 	explosion_animation(false),
 	dynamite_explosion_rotation_f(0.0f),
 	dynamite_explosion_scaling_f(1.0f),
-	skipframe(0),
+	d_to_d_collision_check(false),
+	initialization(true),
 	show(true)
 	{
-		body.AddChild(&fuse);
-		initialization = true;
 	}
 	Cylinder body;
 	Cylinder fuse;
+	bool d_to_d_collision_check;
 	bool initialization;
 	bool explosion_animation;
 	bool show;
@@ -29,7 +30,6 @@ struct Dynamite{
 	float z;
 	float height;
 	float fuse_length;
-	int skipframe;
 	float dynamite_explosion_rotation_f;
 	float dynamite_explosion_scaling_f;
 	mat4 body_translation;

@@ -125,7 +125,6 @@ Core()
 	sphere_cannon.AddChild(&scissor2);
 
 	dynamite_position = 0;
-	int random = 0;
 
 	/******* STATIC MATRIX DEFINITIONS ******/
 	//VIEW MATRIX
@@ -133,10 +132,10 @@ Core()
 	//TODO
 	//En faire une deuxieme pour des points bonis qui sera toggle par une touche du clavier.
 	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 9), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 }
 
-void CoreTP1::Render(double dt) //dt is the time unit
+void CoreTP1::Render(double dt)
 {
 	if (timeUnit <= 5){
 		/*	if (timeUnit <=80 && !showCountdown)
@@ -193,7 +192,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		mat4 scissor2_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 dynamite_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 
-		for (int i = 0; i < dynamites.size(); i++){
+		for (unsigned int i = 0; i < dynamites.size(); i++){
 			dynamites.at(i).explosion_rotation = glm::rotate(glm::mat4(), dynamites.at(i).dynamite_explosion_rotation_f, glm::vec3(0.0, 0.0, 1.0));
 			dynamites.at(i).explosion_scaling = glm::scale(glm::mat4(), glm::vec3(dynamites.at(i).dynamite_explosion_scaling_f, dynamites.at(i).dynamite_explosion_scaling_f, dynamites.at(i).dynamite_explosion_scaling_f));
 		}
@@ -357,7 +356,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		scissor1.Render();
 		scissor2.Render();
 		if (createDynamite){
-			for (int i = 0; i < 3; i++){
+			for (int i = 0; i < 100; i++){
 				Dynamite dynamite(
 					RandomNumber(-3.8, 3.8),
 					RandomNumber(-2.8, 2.8),
@@ -368,7 +367,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			createDynamite = false;
 
 		}
-		for (int i = 0; i < dynamites.size(); i++){
+		for (unsigned int i = 0; i < dynamites.size(); i++){
 			dynamites.at(i).body.AddChild(&dynamites.at(i).fuse);
 			dynamites.at(i).body.SetTransform(
 				dynamites.at(i).body_translation*
@@ -383,17 +382,34 @@ void CoreTP1::Render(double dt) //dt is the time unit
 				dynamites.at(i).body.Render();
 				dynamites.at(i).fuse.Render();
 			}
-			if (Collisions::OBBDetection(dynamites.at(i).body, body) &&
-				dynamites.at(i).initialization == true){
+			bool generateNew = false;
+			for (unsigned int j = 0; j < dynamites.size(); j++){
+				if (j != i){
+					if (Collisions::OBBDetection(dynamites.at(i).body, dynamites.at(j).body) && 
+						dynamites.at(i).initialization){
+						generateNew = true;
+						break;
+					}
+					else {
+						dynamites.at(i).d_to_d_collision_check = true;
+						
+					}
+				}
+				
+			}
+
+			if (generateNew || (Collisions::OBBDetection(dynamites.at(i).body, body) &&
+				dynamites.at(i).initialization == true)){
 				dynamites.at(i) = Dynamite(RandomNumber(-3.8, 3.8),
 					RandomNumber(-2.8, 2.8),
 					RandomNumber(1.4, 2.2),
 					RandomNumber(0.3, 0.9));
 			}
-			else {
+			else if (dynamites.at(i).d_to_d_collision_check == true){
 				dynamites.at(i).initialization = false;
 			}
-			
+
+
 		}
 	}
 	timeUnit++;
@@ -406,13 +422,12 @@ void CoreTP1::ScissorsAnimation(){
 				skipframe++;
 			}
 			else {
-				for (int i = 0; i < dynamites.size(); i++){
+				for (unsigned int i = 0; i < dynamites.size(); i++){
 					if (Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
 						Collisions::OBBDetection(scissor2, dynamites.at(i).fuse)){
-						dynamites.at(i).explosion_animation = true;
+						dynamites.at(i).show = false;
 					}
 				}
-				
 			}
 			scissors_rotation_f += 0.02;
 		}
@@ -429,10 +444,10 @@ void CoreTP1::ScissorsAnimation(){
 }
 
 void CoreTP1::ExplosionAnimation(){
-	for (int i = 0; i<dynamites.size(); i++){
+	for (unsigned int i = 0; i<dynamites.size(); i++){
 		if (dynamites.at(i).explosion_animation) {
 			if (dynamites.at(i).dynamite_explosion_scaling_f > 0.03) {
-				dynamites.at(i).dynamite_explosion_rotation_f += 0.2 * glm::pi<float>();
+				dynamites.at(i).dynamite_explosion_rotation_f += 0.2 * glm::pi<double>();
 				dynamites.at(i).dynamite_explosion_scaling_f -= 0.03;
 			}
 			else {
