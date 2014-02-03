@@ -9,13 +9,10 @@
 //-implanter la dynamique de jeu
 //-
 int timeUnit = 0;
+bool do_once = true;
 bool temp = false;
 bool showCountdown = false;
-bool explosion_animation = false;
-bool showDynamite = true;
 bool createDynamite = true;
-float dynamite_explosion_rotation_f = 0.0f;
-float dynamite_explosion_scaling_f = 1.0f;
 int skipframe = 0;
 float body_shear[16] = {
 	1, 0, 0, 0,
@@ -165,10 +162,10 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	else {
 
 
-		for (int i = 0; i < dynamites.size(); i++){
-			ScissorsAnimation(i);
-			ExplosionAnimation(i);
-		}
+		
+			
+		ExplosionAnimation();
+		ScissorsAnimation();
 		CheckCollisions(dynamites.size());
 
 		/******* DYNAMIC MATRIX DEFINITIONS ******/
@@ -195,8 +192,12 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		mat4 scissor1_rotation = glm::rotate(glm::mat4(), scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 scissor2_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
 		mat4 dynamite_rotation = glm::rotate(glm::mat4(), -scissors_rotation_f, glm::vec3(0.0, 1.0, 0.0));
-		mat4 dynamite_explosion_rotation = glm::rotate(glm::mat4(), dynamite_explosion_rotation_f, glm::vec3(0.0, 0.0, 1.0));
-		mat4 dynamite_explosion_scaling = glm::scale(glm::mat4(), glm::vec3(dynamite_explosion_scaling_f, dynamite_explosion_scaling_f, dynamite_explosion_scaling_f));
+
+		for (int i = 0; i < dynamites.size(); i++){
+			dynamites.at(i).explosion_rotation = glm::rotate(glm::mat4(), dynamites.at(i).dynamite_explosion_rotation_f, glm::vec3(0.0, 0.0, 1.0));
+			dynamites.at(i).explosion_scaling = glm::scale(glm::mat4(), glm::vec3(dynamites.at(i).dynamite_explosion_scaling_f, dynamites.at(i).dynamite_explosion_scaling_f, dynamites.at(i).dynamite_explosion_scaling_f));
+		}
+		
 
 		/******* TRANSFORMATIONS SETTING ******/
 
@@ -356,7 +357,7 @@ void CoreTP1::Render(double dt) //dt is the time unit
 		scissor1.Render();
 		scissor2.Render();
 		if (createDynamite){
-			for (int i = 0; i < 100; i++){
+			for (int i = 0; i < 3; i++){
 				Dynamite dynamite(
 					RandomNumber(-3.8, 3.8),
 					RandomNumber(-2.8, 2.8),
@@ -371,14 +372,14 @@ void CoreTP1::Render(double dt) //dt is the time unit
 			dynamites.at(i).body.AddChild(&dynamites.at(i).fuse);
 			dynamites.at(i).body.SetTransform(
 				dynamites.at(i).body_translation*
-				dynamite_explosion_rotation*
-				dynamite_explosion_scaling
+				dynamites.at(i).explosion_rotation*
+				dynamites.at(i).explosion_scaling
 				);
 			dynamites.at(i).fuse.SetTransform(
 				dynamites.at(i).fuse_translation
 				);
 
-			if (showDynamite) {
+			if (dynamites.at(i).show) {
 				dynamites.at(i).body.Render();
 				dynamites.at(i).fuse.Render();
 			}
@@ -398,17 +399,20 @@ void CoreTP1::Render(double dt) //dt is the time unit
 	timeUnit++;
 }
 
-void CoreTP1::ScissorsAnimation(int i){
+void CoreTP1::ScissorsAnimation(){
 	if (scissors_animation){
 		if (scissors_rotation_f < 1.1 && !descent){
 			if (skipframe < 5){
 				skipframe++;
 			}
 			else {
-				if (Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
-					Collisions::OBBDetection(scissor2, dynamites.at(i).fuse)){
-					explosion_animation = true;
+				for (int i = 0; i < dynamites.size(); i++){
+					if (Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
+						Collisions::OBBDetection(scissor2, dynamites.at(i).fuse)){
+						dynamites.at(i).explosion_animation = true;
+					}
 				}
+				
 			}
 			scissors_rotation_f += 0.02;
 		}
@@ -423,17 +427,20 @@ void CoreTP1::ScissorsAnimation(int i){
 		if (!scissors_animation) skipframe = 0;
 	}
 }
-void CoreTP1::ExplosionAnimation(int i){
-	if (explosion_animation) {
-		if (dynamite_explosion_scaling_f > 0.03) {
-			dynamite_explosion_rotation_f += 0.2 * glm::pi<float>();
-			dynamite_explosion_scaling_f -= 0.03;
-		}
-		else {
-			explosion_animation = false;
-			showDynamite = false;
-			dynamite_explosion_rotation_f += 0.25;
-			dynamite_explosion_scaling_f = 1.0;
+
+void CoreTP1::ExplosionAnimation(){
+	for (int i = 0; i<dynamites.size(); i++){
+		if (dynamites.at(i).explosion_animation) {
+			if (dynamites.at(i).dynamite_explosion_scaling_f > 0.03) {
+				dynamites.at(i).dynamite_explosion_rotation_f += 0.2 * glm::pi<float>();
+				dynamites.at(i).dynamite_explosion_scaling_f -= 0.03;
+			}
+			else {
+				dynamites.at(i).explosion_animation = false;
+				dynamites.at(i).show = false;
+				dynamites.at(i).dynamite_explosion_rotation_f += 0.25;
+				dynamites.at(i).dynamite_explosion_scaling_f = 1.0;
+			}
 		}
 	}
 }

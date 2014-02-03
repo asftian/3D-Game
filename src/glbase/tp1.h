@@ -10,7 +10,12 @@ struct Dynamite{
 	fuse(0.02, fuse_length, vec3(212.0 / 255, 212.0 / 255, 212.0 / 255)),
 	body(0.2, height, vec3(1.0, 0.0, 0.0)),
 	body_translation(translate(glm::mat4(), glm::vec3(x, height/2 , z))),
-	fuse_translation(translate(glm::mat4(), glm::vec3(0.0, height/2+fuse_length/2, 0.0)))
+	fuse_translation(translate(glm::mat4(), glm::vec3(0.0, height/2+fuse_length/2, 0.0))),
+	explosion_animation(false),
+	dynamite_explosion_rotation_f(0.0f),
+	dynamite_explosion_scaling_f(1.0f),
+	skipframe(0),
+	show(true)
 	{
 		body.AddChild(&fuse);
 		initialization = true;
@@ -18,12 +23,19 @@ struct Dynamite{
 	Cylinder body;
 	Cylinder fuse;
 	bool initialization;
+	bool explosion_animation;
+	bool show;
 	float x;
 	float z;
 	float height;
 	float fuse_length;
+	int skipframe;
+	float dynamite_explosion_rotation_f;
+	float dynamite_explosion_scaling_f;
 	mat4 body_translation;
 	mat4 fuse_translation;
+	mat4 explosion_rotation;
+	mat4 explosion_scaling;
 };
 
 class CoreTP1 : public Core
@@ -35,8 +47,8 @@ public:
 
 protected:
 	virtual void Render(double dt) override;
-	void ScissorsAnimation(int i);
-	void ExplosionAnimation(int i);
+	void ScissorsAnimation();
+	void ExplosionAnimation();
 	void CheckCollisions(int i);
 
 	Box plane;
