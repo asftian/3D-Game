@@ -349,6 +349,7 @@ void CoreTP1::Render(double dt)
 				SpawnDynamites();
 				ExplosionAnimation();
 				ScissorsAnimation();
+				BlinkAnimation();
 				
 				CheckCollisionsWithTruck();
 				
@@ -390,6 +391,22 @@ void CoreTP1::FusesAnimations(){
 
 	}
 }
+
+void CoreTP1::BlinkAnimation(){
+	for (unsigned int i = 0; i < dynamites.size(); i++){
+		if (dynamites.at(i).blink < 300){
+			if (dynamites.at(i).blink % 2 == 0){
+				dynamites.at(i).show = false;
+			}
+			else
+				dynamites.at(i).show = true;
+			dynamites.at(i).blink++;
+		}
+		else if (dynamites.at(i).blink < 999){
+			dynamites.at(i).show = false;
+		}
+	}
+}
 void CoreTP1::ScissorsAnimation(){
 	if (scissors_animation){
 		if (scissors_rotation_f < 1.1 && !descent){
@@ -398,10 +415,11 @@ void CoreTP1::ScissorsAnimation(){
 			}
 			else {
 				for (unsigned int i = 0; i < dynamites.size(); i++){
-					if (dynamites.at(i).show &&
+					if (dynamites.at(i).can_cut &&
 						(Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
 						Collisions::OBBDetection(scissor2, dynamites.at(i).fuse))){
-						dynamites.at(i).show = false;
+						dynamites.at(i).can_cut = false;
+						dynamites.at(i).blink = 0;
 					}
 				}
 			}

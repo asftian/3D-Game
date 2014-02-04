@@ -27,6 +27,7 @@ protected:
 	void SpawnDynamites();
 	void RenderDynamites(int dynamite_to_render);
 	void Reset();
+	void BlinkAnimation();
 	
 
 	Box plane;
