@@ -8,28 +8,17 @@
 //-rajouter lanimation des sciseaux avec la touche correspondante
 //-implanter la dynamique de jeu
 //-
-int timeUnit = 0;
+
 bool set_time_to_0 = true;
-bool temp = false;
 bool game_started = false;
 bool you_lost = false;
-int game_state = 0;
 bool show_welcome_screen = true;
 bool createDynamite = true;
-int skipframe = 0;
-float body_shear[16] = {
-	1, 0, 0, 0,
-	-0.5, 1, 0, 0,
-	0, 0, 1, 0,
-	0, 0, 0, 1 };
-
-float scissors_shear[16] = {
-	1, 0, 0, 0,
-	0, 1, 0, 0,
-	-2, 0, 1, 0,
-	0, 0, 0, 1 };
-
 bool descent = false;
+
+int timeUnit = 0;
+int game_state = 0;
+int skipframe = 0;
 
 float RandomNumber(float Min, float Max)
 {
@@ -37,9 +26,16 @@ float RandomNumber(float Min, float Max)
 }
 
 //SHEAR
-mat4 body_initial_shear = glm::make_mat4(body_shear);
-mat4 scissors_initial_shear = glm::make_mat4(scissors_shear);
-
+mat4 body_initial_shear{
+	1, 0, 0, 0,
+	-0.5, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1 };
+mat4 scissors_initial_shear{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		-2, 0, 1, 0,
+		0, 0, 0, 1 };
 //TRANSLATION MATRIX
 mat4 body_initial_translation = (glm::translate(glm::mat4(), glm::vec3(0.0, 0.6, 0.0)));
 mat4 wheel_fl_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.31, 0.55));
@@ -143,15 +139,14 @@ void CoreTP1::Render(double dt)
 	case 0:{
 
 			   DrawText("Get Ready!", vec2(0.5, 0.5));
-			   if (timeUnit >= 2000){
+			   if (timeUnit >= 3000){
 				   game_state = 1;
 				   timeUnit = 0;
 			   }
 			   break;
 	}
 	case 1: {
-				if (timeUnit >= 500) game_started = true;
-				
+				if (timeUnit >= 1000) game_started = true;
 				if (game_started && createDynamite){
 					CreateDynamite();
 					CreateDynamite();
@@ -159,8 +154,6 @@ void CoreTP1::Render(double dt)
 					createDynamite = false;
 				}
 				
-					
-
 
 				/******* DYNAMIC MATRIX DEFINITIONS ******/
 				//CONSTRAINTS
@@ -374,8 +367,7 @@ void CoreTP1::Render(double dt)
 				break;
 	}
 	case 2: {
-				if (timeUnit <= 2000){
-
+				if (timeUnit <= 3000){
 					DrawText("You lost dude...", vec2(0.5, 0.5));
 				}
 				else Reset();
@@ -389,14 +381,12 @@ void CoreTP1::FusesAnimations(){
 		dynamites.at(i).life_time++;
 		float fuse_height = dynamites.at(i).fuse.GetBB().c.y + dynamites.at(i).fuse.GetBB().e.at(1);
 		float dynamite_height = dynamites.at(i).body.GetBB().c.y + dynamites.at(i).body.GetBB().e.at(1);
-
 		if (fuse_height > dynamite_height-0.1)
-			dynamites.at(i).fuse_scale_factor -= 0.001;
-		else if (dynamites.at(i).life_time > 1){
+			dynamites.at(i).fuse_scale_factor -= 0.0001;
+		else if (dynamites.at(i).life_time > 1){ //bug workaround
 			dynamites.at(i).explosion_animation = true;
 			you_lost = true;
 		}
-
 
 	}
 }
@@ -433,14 +423,14 @@ void CoreTP1::ExplosionAnimation(){
 	for (unsigned int i = 0; i<dynamites.size(); i++){
 		if (dynamites.at(i).explosion_animation) {
 			if (dynamites.at(i).dynamite_explosion_scaling_f > 0.03) {
-				dynamites.at(i).dynamite_explosion_rotation_f += 0.2 * glm::pi<double>();
-				dynamites.at(i).dynamite_explosion_scaling_f -= 0.03;
+				dynamites.at(i).dynamite_explosion_rotation_f += 0.05 * glm::pi<double>();
+				dynamites.at(i).dynamite_explosion_scaling_f -= 0.005;
 			}
 			else {
 				dynamites.at(i).explosion_animation = false;
 				dynamites.at(i).show = false;
-				dynamites.at(i).dynamite_explosion_rotation_f += 0.25;
-				dynamites.at(i).dynamite_explosion_scaling_f = 1.0;
+				dynamites.at(i).dynamite_explosion_rotation_f += 0.05;
+				dynamites.at(i).dynamite_explosion_scaling_f = 0.3;
 			}
 		}
 	}
@@ -467,7 +457,28 @@ void CoreTP1::CheckCollisionsWithTruck(){
 			Collisions::OBBDetection(scissor2, dynamites.at(i).fuse) ||
 			Collisions::OBBDetection(cannon, dynamites.at(i).fuse) ||
 			Collisions::OBBDetection(scissor1, dynamites.at(i).fuse)|| 
-			Collisions::OBBDetection(scissor2, dynamites.at(i).fuse))) 
+			Collisions::OBBDetection(scissor2, dynamites.at(i).fuse) ||
+			Collisions::AABBDetection(dynamites.at(i).body,wheel_fl) || 
+			Collisions::AABBDetection(dynamites.at(i).body, wheel_fr) || 
+			Collisions::AABBDetection(dynamites.at(i).body, wheel_rl) || 
+			Collisions::AABBDetection(dynamites.at(i).body, wheel_rr) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box1)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box2)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box3)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box4)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box1)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box2)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box3)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box4)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box1)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box2)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box3)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box4)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box1)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box2)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box3)||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box4)
+			))
 		{
 			no_collision = false;
 			if (key_pressed == 'w'){
@@ -545,17 +556,46 @@ void CoreTP1::CheckSpawningCollisions(int dynamite_to_check){
 			}
 		}
 	}
-
-	if (generateNew || (Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, body) &&
+	if (generateNew ||
+		((Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, body) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fl) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fr) || 
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rl) || 
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fl_box1) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fl_box2) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fl_box3) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fl_box4) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fr_box1) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fr_box2) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fr_box3) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fr_box4) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rl_box1) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rl_box2) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rl_box3) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rl_box4) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box1) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box2) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box3) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box4) ||
+		Collisions::OBBDetection(cannon, dynamites.at(dynamite_to_check).body) ||
+		Collisions::OBBDetection(scissor1, dynamites.at(dynamite_to_check).fuse) ||
+		Collisions::OBBDetection(scissor2, dynamites.at(dynamite_to_check).fuse) ||
+		Collisions::OBBDetection(cannon, dynamites.at(dynamite_to_check).fuse) ||
+		Collisions::OBBDetection(scissor1, dynamites.at(dynamite_to_check).fuse) ||
+		Collisions::OBBDetection(scissor2, dynamites.at(dynamite_to_check).fuse)
+		) &&
 		dynamites.at(dynamite_to_check).initialization == true)){
 		dynamites.at(dynamite_to_check) = Dynamite(RandomNumber(-3.8, 3.8),
 			RandomNumber(-2.8, 2.8),
 			RandomNumber(1.4, 2.2),
 			RandomNumber(0.3, 0.9));
 	}
+	
 	else if (dynamites.at(dynamite_to_check).d_to_d_collision_check == true){
 		dynamites.at(dynamite_to_check).initialization = false;
 	}
+
 }
 
 void CoreTP1::Reset(){
@@ -567,6 +607,10 @@ void CoreTP1::Reset(){
 	show_welcome_screen = true;
 	set_time_to_0 = true;
 	timeUnit = 0;
+	cannon_scaling_f = 0.5;
+	tower_scaling_f = 1.0;
+	cannon_rotation_f = 0;
+	
 }
 CoreTP1::~CoreTP1()
 {
