@@ -6,12 +6,9 @@
 /***************************/
 //***TODO
 //
-//-rajouter un cube sur la roue pour la voir tourner et la faire tourner
-//-rajouter lanimation des sciseaux avec la touche correspondante
-//-implanter la dynamique de jeu
-//-
 
-bool createDynamite = true;
+
+bool createFirstDynamite = true;
 bool descent = false;
 
 std::clock_t start_time;
@@ -22,6 +19,7 @@ double duration;
 int timeUnit = 0;
 int game_state = 0;
 int skipframe = 0;
+int score = 0;
 
 float RandomNumber(float Min, float Max)
 {
@@ -131,7 +129,7 @@ Core()
 	//Positionnement de la camera.
 	//TODO
 	//En faire une deuxieme pour des points bonis qui sera toggle par une touche du clavier.
-	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 9), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	srand(static_cast<unsigned int>(time(NULL)));
 }
 
@@ -159,15 +157,13 @@ void CoreTP1::Render(double dt)
 	case 2: {	
 				duration = (std::clock() - start_time) / (double)CLOCKS_PER_SEC;
 				
-				if (createDynamite) {
-					CreateDynamite();
-					CreateDynamite();
-					createDynamite = false;
-				}
-
-				if ((std::clock() - timer) / (double) CLOCKS_PER_SEC >= 5.0) {
+				if ((std::clock() - timer) / (double) CLOCKS_PER_SEC >= 3.0) {
 					timer = std::clock();
 					float random = RandomNumber(0.5, 1.5);
+					if (createFirstDynamite){
+						CreateDynamite();
+						createFirstDynamite = false;
+					}
 					if (random * log(duration / 5) <= 1.5 * log(duration / 5) - 0.5) {
 						CreateDynamite();
 					}
@@ -379,7 +375,9 @@ void CoreTP1::Render(double dt)
 
 	case 3: {
 				duration = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
-				DrawText("You lost dude...", vec2(0.5, 0.5));
+				std::string score_string = "Your score is "+std::to_string(score);
+				const char * s = score_string.c_str();
+				DrawText(s, vec2(0.5, 0.5));
 				if (duration >= 2.5)
 					Reset();
 				break;
@@ -430,6 +428,7 @@ void CoreTP1::ScissorsAnimation(){
 						Collisions::OBBDetection(scissor2, dynamites.at(i).fuse))){
 						dynamites.at(i).can_cut = false;
 						dynamites.at(i).blink = 0;
+						score++;
 					}
 				}
 			}
@@ -692,6 +691,7 @@ void CoreTP1::CheckSpawningCollisions(int dynamite_to_check){
 
 void CoreTP1::Reset(){
 	game_state = 0;
+	score = 0;
 	dynamites.clear();
 	createDynamite = true;
 	cannon_scaling_f = 0.5;
