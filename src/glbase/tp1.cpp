@@ -3,18 +3,15 @@
 #include <cstdio>
 #include <ctime>
 
-/***************************/
-//***TODO
-//
 
-
-bool createFirstDynamite = true;
+bool create_first_dynamite = true;
 bool descent = false;
 
 std::clock_t start_time;
 std::clock_t timer;
 
-double duration;
+double timer_duration;
+double time_elapsed;
 
 int timeUnit = 0;
 int game_state = 0;
@@ -32,11 +29,14 @@ mat4 body_initial_shear{
 	-0.5, 1, 0, 0,
 	0, 0, 1, 0,
 	0, 0, 0, 1 };
+
 mat4 scissors_initial_shear{
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		-2, 0, 1, 0,
 		0, 0, 0, 1 };
+
+
 //TRANSLATION MATRIX
 mat4 body_initial_translation = (glm::translate(glm::mat4(), glm::vec3(0.0, 0.6, 0.0)));
 mat4 wheel_fl_initial_translation = glm::translate(glm::mat4(), glm::vec3(0.5, 0.31, 0.55));
@@ -125,10 +125,6 @@ Core()
 	sphere_cannon.AddChild(&scissor2);
 
 	/******* STATIC MATRIX DEFINITIONS ******/
-	//VIEW MATRIX
-	//Positionnement de la camera.
-	//TODO
-	//En faire une deuxieme pour des points bonis qui sera toggle par une touche du clavier.
 	_viewMatrix = glm::lookAt(glm::vec3(3, 5, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	srand(static_cast<unsigned int>(time(NULL)));
 }
@@ -144,9 +140,9 @@ void CoreTP1::Render(double dt)
 	}
 
 	case 1:{	
-			   duration = (std::clock() - timer) / (double) CLOCKS_PER_SEC;
+			   timer_duration = (std::clock() - timer) / (double) CLOCKS_PER_SEC;
 			   DrawText("Get Ready!", vec2(0.5, 0.5));
-			   if (duration >= 2.5){
+			   if (timer_duration >= 2.5){
 				   timer = std::clock();
 				   start_time = std::clock();
 				   game_state = 2;
@@ -155,16 +151,17 @@ void CoreTP1::Render(double dt)
 	}
 
 	case 2: {	
-				duration = (std::clock() - start_time) / (double)CLOCKS_PER_SEC;
+				time_elapsed = (std::clock() - start_time) / (double)CLOCKS_PER_SEC;
 				
-				if ((std::clock() - timer) / (double) CLOCKS_PER_SEC >= 3.0) {
+				if (create_first_dynamite){
+					CreateDynamite();
+					create_first_dynamite = false;
+				}
+
+				if ((std::clock() - timer) / (double) CLOCKS_PER_SEC >= 5.0) {
 					timer = std::clock();
 					float random = RandomNumber(0.5, 1.5);
-					if (createFirstDynamite){
-						CreateDynamite();
-						createFirstDynamite = false;
-					}
-					if (random * log(duration / 5) <= 1.5 * log(duration / 5) - 0.5) {
+					if (random * log(time_elapsed / 5) <= 1.5 * log(time_elapsed / 5) - 0.5) {
 						CreateDynamite();
 					}
 				}
@@ -182,8 +179,8 @@ void CoreTP1::Render(double dt)
 					cannon_scaling_f = 0.1;
 				if (tower_scaling_f >= 2)
 					tower_scaling_f = 2;
-				if (tower_scaling_f <= 0.1)
-					tower_scaling_f = 0.1;
+				if (tower_scaling_f <= 0.17)
+					tower_scaling_f = 0.17;
 
 				float wheel_rotation_f = -(truck_movement_f / (2.0f * glm::pi<float>() * 0.18f)) * 2 * glm::pi<float>();
 
@@ -374,11 +371,11 @@ void CoreTP1::Render(double dt)
 	}
 
 	case 3: {
-				duration = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
-				std::string score_string = "Your score is "+std::to_string(score);
+				timer_duration = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
+				std::string score_string = "Time: " + std::to_string((int) time_elapsed) + "   Score: " + std::to_string(score * 10);
 				const char * s = score_string.c_str();
 				DrawText(s, vec2(0.5, 0.5));
-				if (duration >= 2.5)
+				if (timer_duration >= 2.5)
 					Reset();
 				break;
 	}
@@ -395,7 +392,6 @@ void CoreTP1::FusesAnimations(){
 		else if (dynamites.at(i).life_time > 1){ //bug workaround
 			dynamites.at(i).explosion_animation = true;
 		}
-
 	}
 }
 
@@ -418,6 +414,11 @@ void CoreTP1::BlinkAnimation(){
 void CoreTP1::ScissorsAnimation(){
 	if (scissors_animation){
 		if (scissors_rotation_f < 1.1 && !descent){
+			for (unsigned int i = 0; i < dynamites.size(); i++) {
+				if (Collisions::OBBDetection(scissor1, dynamites.at(i).body) || Collisions::OBBDetection(scissor2, dynamites.at(i).body)) {
+					descent = true;
+				}
+			}
 			if (skipframe < 5){
 				skipframe++;
 			}
@@ -617,7 +618,6 @@ void CoreTP1::SpawnDynamites(){
 		dynamites.at(i).fuse.SetTransform(
 			dynamites.at(i).fuse_scaling*
 			dynamites.at(i).fuse_translation
-
 			);
 
 		RenderDynamites(i);
@@ -694,12 +694,13 @@ void CoreTP1::Reset(){
 	game_state = 0;
 	score = 0;
 	dynamites.clear();
-	createFirstDynamite = true;
+	create_first_dynamite = true;
 	cannon_scaling_f = 0.5;
 	tower_scaling_f = 1.0;
 	cannon_rotation_f = 0;
 
 }
+
 CoreTP1::~CoreTP1()
 {
 }
