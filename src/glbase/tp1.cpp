@@ -634,6 +634,7 @@ void CoreTP1::RenderDynamites(int dynamite_to_render){
 }
 void CoreTP1::CheckSpawningCollisions(int dynamite_to_check){
 	bool generateNew = false;
+	if (dynamites.size() == 1) dynamites.at(0).d_to_d_collision_check = true;
 	for (unsigned int j = 0; j < dynamites.size(); j++){
 		if (j != dynamite_to_check){
 			if (Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, dynamites.at(j).body) &&
@@ -693,7 +694,7 @@ void CoreTP1::Reset(){
 	game_state = 0;
 	score = 0;
 	dynamites.clear();
-	createDynamite = true;
+	createFirstDynamite = true;
 	cannon_scaling_f = 0.5;
 	tower_scaling_f = 1.0;
 	cannon_rotation_f = 0;
