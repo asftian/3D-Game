@@ -1,5 +1,7 @@
 #include "tp1.h"
 #include <iostream>
+#include <cstdio>
+#include <ctime>
 
 /***************************/
 //***TODO
@@ -9,12 +11,13 @@
 //-implanter la dynamique de jeu
 //-
 
-bool set_time_to_0 = true;
-bool game_started = false;
-bool you_lost = false;
-bool show_welcome_screen = true;
 bool createDynamite = true;
 bool descent = false;
+
+std::clock_t start_time;
+std::clock_t timer;
+
+double duration;
 
 int timeUnit = 0;
 int game_state = 0;
@@ -137,23 +140,35 @@ void CoreTP1::Render(double dt)
 	switch (game_state){
 
 	case 0:{
+			   timer = std::clock();
+			   game_state = 1;
+			   break;
+	}
 
+	case 1:{	
+			   duration = (std::clock() - timer) / (double) CLOCKS_PER_SEC;
 			   DrawText("Get Ready!", vec2(0.5, 0.5));
-			   if (timeUnit >= 3000){
-				   game_state = 1;
-				   timeUnit = 0;
+			   if (duration >= 2.5){
+				   start_time = std::clock();
+				   game_state = 2;
 			   }
 			   break;
 	}
-	case 1: {
-				if (timeUnit >= 1000) game_started = true;
-				if (game_started && createDynamite){
-					CreateDynamite();
+
+	case 2: {			
+				if (createDynamite) {
 					CreateDynamite();
 					CreateDynamite();
 					createDynamite = false;
 				}
-				
+
+				if ((std::clock() - timer) / (double) CLOCKS_PER_SEC == 1.0) {
+					float random = RandomNumber(0.0, 1.0);
+					if (random * (1.0 + log2(duration)) / 1.0 >= 0.95) {
+						CreateDynamite();
+					}
+				}
+
 
 				/******* DYNAMIC MATRIX DEFINITIONS ******/
 				//CONSTRAINTS
@@ -350,43 +365,33 @@ void CoreTP1::Render(double dt)
 				ExplosionAnimation();
 				ScissorsAnimation();
 				BlinkAnimation();
-				
+
 				CheckCollisionsWithTruck();
-				
+
 				FusesAnimations();
-				
 
-
-
-				if (you_lost){
-					if (set_time_to_0){
-						timeUnit = 0;
-						set_time_to_0 = false;
-					}
-					if (timeUnit > 300) game_state = 2;
-				}
 				break;
 	}
-	case 2: {
-				if (timeUnit <= 3000){
-					DrawText("You lost dude...", vec2(0.5, 0.5));
-				}
-				else Reset();
+
+	case 3: {
+				duration = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
+				DrawText("You lost dude...", vec2(0.5, 0.5));
+				if (duration >= 2.5)
+					Reset();
 				break;
 	}
 	}
-	timeUnit++;
 }
+
 void CoreTP1::FusesAnimations(){
 	for (unsigned int i = 0; i < dynamites.size(); i++){
 		dynamites.at(i).life_time++;
 		float fuse_height = dynamites.at(i).fuse.GetBB().c.y + dynamites.at(i).fuse.GetBB().e.at(1);
 		float dynamite_height = dynamites.at(i).body.GetBB().c.y + dynamites.at(i).body.GetBB().e.at(1);
-		if (fuse_height > dynamite_height-0.1)
+		if (fuse_height > dynamite_height - 0.1)
 			dynamites.at(i).fuse_scale_factor -= 0.0001;
 		else if (dynamites.at(i).life_time > 1){ //bug workaround
 			dynamites.at(i).explosion_animation = true;
-			you_lost = true;
 		}
 
 	}
@@ -407,6 +412,7 @@ void CoreTP1::BlinkAnimation(){
 		}
 	}
 }
+
 void CoreTP1::ScissorsAnimation(){
 	if (scissors_animation){
 		if (scissors_rotation_f < 1.1 && !descent){
@@ -449,12 +455,12 @@ void CoreTP1::ExplosionAnimation(){
 				dynamites.at(i).show = false;
 				dynamites.at(i).dynamite_explosion_rotation_f += 0.05;
 				dynamites.at(i).dynamite_explosion_scaling_f = 0.3;
+				timer = std::clock();
+				game_state = 3;
 			}
 		}
 	}
 }
-
-
 
 void CoreTP1::CreateDynamite(){
 	Dynamite dynamite(
@@ -465,72 +471,135 @@ void CoreTP1::CreateDynamite(){
 	dynamites.push_back(dynamite);
 
 }
+
 void CoreTP1::CheckCollisionsWithTruck(){
 	bool no_collision = true;
 	for (int i = 0; i < dynamites.size(); i++){
-		if (dynamites.at(i).show && (Collisions::AABBDetection(dynamites.at(i).fuse, sphere_cannon) ||
-			Collisions::AABBDetection(dynamites.at(i).body, body) ||
-			Collisions::OBBDetection(cannon, dynamites.at(i).body) ||
-			Collisions::OBBDetection(scissor1, dynamites.at(i).fuse) ||
-			Collisions::OBBDetection(scissor2, dynamites.at(i).fuse) ||
-			Collisions::OBBDetection(cannon, dynamites.at(i).fuse) ||
-			Collisions::OBBDetection(scissor1, dynamites.at(i).fuse)|| 
-			Collisions::OBBDetection(scissor2, dynamites.at(i).fuse) ||
-			Collisions::AABBDetection(dynamites.at(i).body,wheel_fl) || 
-			Collisions::AABBDetection(dynamites.at(i).body, wheel_fr) || 
-			Collisions::AABBDetection(dynamites.at(i).body, wheel_rl) || 
+		if (dynamites.at(i).show &&
+			(Collisions::AABBDetection(dynamites.at(i).body, body) ||
+			Collisions::OBBDetection(dynamites.at(i).body, sphere_cannon) ||
+			Collisions::OBBDetection(dynamites.at(i).body, cannon) ||
+			Collisions::OBBDetection(dynamites.at(i).body, scissor1) ||
+			Collisions::OBBDetection(dynamites.at(i).body, scissor2) ||
+			Collisions::OBBDetection(dynamites.at(i).fuse, sphere_cannon) ||
+			Collisions::OBBDetection(dynamites.at(i).fuse, cannon) ||
+			Collisions::OBBDetection(dynamites.at(i).fuse, scissor1) ||
+			Collisions::OBBDetection(dynamites.at(i).fuse, scissor2) ||
+			Collisions::AABBDetection(dynamites.at(i).body, wheel_fl) ||
+			Collisions::AABBDetection(dynamites.at(i).body, wheel_fr) ||
+			Collisions::AABBDetection(dynamites.at(i).body, wheel_rl) ||
 			Collisions::AABBDetection(dynamites.at(i).body, wheel_rr) ||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box1)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box2)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box3)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box4)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box1)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box2)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box3)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box4)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box1)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box2)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box3)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box4)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box1)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box2)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box3)||
-			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box4)
-			))
-		{
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box1) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box2) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box3) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fl_box4) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box1) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box2) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box3) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_fr_box4) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box1) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box2) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box3) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rl_box4) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box1) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box2) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box3) ||
+			Collisions::OBBDetection(dynamites.at(i).body, wheel_rr_box4))) {
+
 			no_collision = false;
-			if (key_pressed == 'w'){
-				movement_forward = false;
+
+			if (key_pressed == 'w') {
+				movement_forward =
+				cannon_scaling_up =
+				cannon_scaling_down =
+				tower_scaling_down =
+				tower_scaling_up =
+				rotation_clockwise =
+				rotation_counter_clockwise =
+				false;
 			}
-			else if (key_pressed == 's'){
-				movement_backward = false;
+			else if (key_pressed == 's') {
+				movement_backward =
+				cannon_scaling_up =
+				cannon_scaling_down =
+				tower_scaling_down =
+				tower_scaling_up =
+				rotation_clockwise =
+				rotation_counter_clockwise =
+				false;
 			}
-			else if (key_pressed == 'r')
-				cannon_scaling_up = false;
-			else if (key_pressed == 'a'){
-				rotation_counter_clockwise = false;
+			else if (key_pressed == 'r') {
+				movement_forward =
+				movement_backward =
+				cannon_scaling_up =
+				tower_scaling_down =
+				tower_scaling_up =
+				rotation_clockwise =
+				rotation_counter_clockwise =
+				false;
 			}
-			else if (key_pressed == 'd'){
-				rotation_clockwise = false;
+			else if (key_pressed == 'a') {
+				movement_forward =
+				movement_backward =
+				cannon_scaling_up =
+				cannon_scaling_down =
+				tower_scaling_down =
+				tower_scaling_up =
+				rotation_counter_clockwise =
+				false;
 			}
-			else if (key_pressed == 'f')
-				cannon_scaling_down = false;
-			else if (key_pressed == 'q')
-				tower_scaling_down = false;
-			else if (key_pressed == 'e')
-				tower_scaling_up = false;
+			else if (key_pressed == 'd') {
+				movement_forward =
+				movement_backward =
+				cannon_scaling_up =
+				cannon_scaling_down =
+				tower_scaling_down =
+				tower_scaling_up =
+				rotation_clockwise =
+				false;
+			}
+			else if (key_pressed == 'f') {
+				movement_forward =
+				movement_backward =
+				cannon_scaling_down =
+				tower_scaling_down =
+				tower_scaling_up =
+				rotation_clockwise =
+				rotation_counter_clockwise =
+				false;
+			}	
+			else if (key_pressed == 'q') {
+				movement_forward =
+				movement_backward =
+				cannon_scaling_up =
+				cannon_scaling_down =
+				tower_scaling_down =
+				rotation_clockwise =
+				rotation_counter_clockwise =
+				false;
+			}
+			else if (key_pressed == 'e') {
+				movement_forward =
+				movement_backward =
+				cannon_scaling_up =
+				cannon_scaling_down =
+				tower_scaling_up =
+				rotation_clockwise =
+				rotation_counter_clockwise =
+				false;
+			}
 		}
 	}
 	if (no_collision){
 		movement_forward =
-			movement_backward =
-			cannon_scaling_up =
-			cannon_scaling_down =
-			tower_scaling_down =
-			tower_scaling_up =
-			rotation_clockwise =
-			rotation_counter_clockwise =
-			true;
+		movement_backward =
+		cannon_scaling_up =
+		cannon_scaling_down =
+		tower_scaling_down =
+		tower_scaling_up =
+		rotation_clockwise =
+		rotation_counter_clockwise =
+		true;
 	}
 }
 
@@ -576,9 +645,17 @@ void CoreTP1::CheckSpawningCollisions(int dynamite_to_check){
 	}
 	if (generateNew ||
 		((Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, body) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, sphere_cannon) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, cannon) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, scissor1) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, scissor2) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).fuse, sphere_cannon) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).fuse, cannon) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).fuse, scissor1) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).fuse, scissor2) ||
 		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fl) ||
-		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fr) || 
-		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rl) || 
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fr) ||
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rl) ||
 		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr) ||
 		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fl_box1) ||
 		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_fl_box2) ||
@@ -595,21 +672,14 @@ void CoreTP1::CheckSpawningCollisions(int dynamite_to_check){
 		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box1) ||
 		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box2) ||
 		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box3) ||
-		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box4) ||
-		Collisions::OBBDetection(cannon, dynamites.at(dynamite_to_check).body) ||
-		Collisions::OBBDetection(scissor1, dynamites.at(dynamite_to_check).fuse) ||
-		Collisions::OBBDetection(scissor2, dynamites.at(dynamite_to_check).fuse) ||
-		Collisions::OBBDetection(cannon, dynamites.at(dynamite_to_check).fuse) ||
-		Collisions::OBBDetection(scissor1, dynamites.at(dynamite_to_check).fuse) ||
-		Collisions::OBBDetection(scissor2, dynamites.at(dynamite_to_check).fuse)
-		) &&
+		Collisions::OBBDetection(dynamites.at(dynamite_to_check).body, wheel_rr_box4)) &&
 		dynamites.at(dynamite_to_check).initialization == true)){
 		dynamites.at(dynamite_to_check) = Dynamite(RandomNumber(-3.8, 3.8),
 			RandomNumber(-2.8, 2.8),
 			RandomNumber(1.4, 2.2),
 			RandomNumber(0.3, 0.9));
 	}
-	
+
 	else if (dynamites.at(dynamite_to_check).d_to_d_collision_check == true){
 		dynamites.at(dynamite_to_check).initialization = false;
 	}
@@ -620,15 +690,10 @@ void CoreTP1::Reset(){
 	game_state = 0;
 	dynamites.clear();
 	createDynamite = true;
-	game_started = false;
-	you_lost = false;
-	show_welcome_screen = true;
-	set_time_to_0 = true;
-	timeUnit = 0;
 	cannon_scaling_f = 0.5;
 	tower_scaling_f = 1.0;
 	cannon_rotation_f = 0;
-	
+
 }
 CoreTP1::~CoreTP1()
 {

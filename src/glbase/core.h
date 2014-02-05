@@ -29,62 +29,57 @@ protected:
 	bool scissors_animation;
 
 	virtual void OnKeyW(bool down) {
-		key_pressed = 'w';
-		
-		if (movement_forward==true)
+		if (movement_forward == true){
+			key_pressed = 'w';
 			truck_movement_f += 0.04;
+		}
 		//_LOG_INFO() << "W " << (down ? "down." : "up.") << std::endl;
 	}
 
 	virtual void OnKeyS(bool down) {
-		key_pressed = 's';
-		
-		cannon_scaling_up = true;
-		if (movement_backward == true)
-			truck_movement_f -= 0.04;
+			if (movement_backward == true) {
+				key_pressed = 's';
+				truck_movement_f -= 0.04;
+			}
 		//_LOG_INFO() << "S " << (down ? "down." : "up.") << std::endl;
 	}
 
-	virtual void OnKeyA(bool down) {
-		key_pressed = 'a';
-		
-		if (rotation_counter_clockwise == true)
+	virtual void OnKeyA(bool down) {		
+		if (rotation_counter_clockwise == true) {
+			key_pressed = 'a';
 			cannon_rotation_f += glm::pi<double>() / 120.0;
+		}
 		//_LOG_INFO() << "A " << (down ? "down." : "up.") << std::endl;
 	}
 
 	virtual void OnKeyD(bool down) {
-		key_pressed = 'd';
-		
-		if (rotation_clockwise == true)
+		if (rotation_clockwise == true) {
+			key_pressed = 'd';
 			cannon_rotation_f -= glm::pi<double>() / 120.0;
+		}
 		//_LOG_INFO() << "D " << (down ? "down." : "up.") << std::endl;
 	}
 
-	virtual void OnKeyR(bool down) {
-		
-		key_pressed = 'r';
-		
-		if (cannon_scaling_up == true)
+	virtual void OnKeyR(bool down) {	
+		if (cannon_scaling_up == true) {
+			key_pressed = 'r';
 			cannon_scaling_f += 0.05;
+		}
 		//_LOG_INFO() << "R " << (down ? "down." : "up.") << std::endl;
 	}
 
-	virtual void OnKeyF(bool down) {
-		key_pressed = 'f';
-		
-		
+	virtual void OnKeyF(bool down) {		
 		if (cannon_scaling_down == true){
+			key_pressed = 'f';
 			if (cannon_scaling_f > 0.15)
 				cannon_scaling_f -= 0.05;
 		}
 		//_LOG_INFO() << "F " << (down ? "down." : "up.") << std::endl;
 	}
 
-	virtual void OnKeyQ(bool down) {
-		key_pressed = 'q';
-		
+	virtual void OnKeyQ(bool down) {		
 		if (tower_scaling_down == true){
+			key_pressed = 'q';
 			if (tower_scaling_f > 0.15)
 				tower_scaling_f -= 0.05;
 		}
@@ -92,10 +87,10 @@ protected:
 	}
 
 	virtual void OnKeyE(bool down) {
-		key_pressed = 'e';
-		
-		if (tower_scaling_up == true)
+		if (tower_scaling_up == true) {
+			key_pressed = 'e';
 			tower_scaling_f += 0.05;
+		}
 		//_LOG_INFO() << "E " << (down ? "down." : "up.") << std::endl;
 	}
 
