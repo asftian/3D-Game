@@ -1,5 +1,6 @@
 #include <main.h>
 #include <log.h>
+#include <string.h>
 
 #pragma warning(push, 0)
 #include <time.h>

@@ -149,22 +149,26 @@ void CoreTP1::Render(double dt)
 			   duration = (std::clock() - timer) / (double) CLOCKS_PER_SEC;
 			   DrawText("Get Ready!", vec2(0.5, 0.5));
 			   if (duration >= 2.5){
+				   timer = std::clock();
 				   start_time = std::clock();
 				   game_state = 2;
 			   }
 			   break;
 	}
 
-	case 2: {			
+	case 2: {	
+				duration = (std::clock() - start_time) / (double)CLOCKS_PER_SEC;
+				
 				if (createDynamite) {
 					CreateDynamite();
 					CreateDynamite();
 					createDynamite = false;
 				}
 
-				if ((std::clock() - timer) / (double) CLOCKS_PER_SEC == 1.0) {
-					float random = RandomNumber(0.0, 1.0);
-					if (random * (1.0 + log2(duration)) / 1.0 >= 0.95) {
+				if ((std::clock() - timer) / (double) CLOCKS_PER_SEC >= 5.0) {
+					timer = std::clock();
+					float random = RandomNumber(0.5, 1.5);
+					if (random * log(duration / 5) <= 1.5 * log(duration / 5) - 0.5) {
 						CreateDynamite();
 					}
 				}
