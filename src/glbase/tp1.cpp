@@ -153,12 +153,13 @@ void CoreTP1::Render(double dt)
 	case 2: {	
 				time_elapsed = (std::clock() - start_time) / (double)CLOCKS_PER_SEC;
 				
-				if (create_first_dynamite){
-					CreateDynamite();
-					create_first_dynamite = false;
-				}
+				
 
 				if ((std::clock() - timer) / (double) CLOCKS_PER_SEC >= 5.0) {
+					if (create_first_dynamite){
+						CreateDynamite();
+						create_first_dynamite = false;
+					}
 					timer = std::clock();
 					float random = RandomNumber(0.5, 1.5);
 					if (random * log(time_elapsed / 5) <= 1.5 * log(time_elapsed / 5) - 0.5) {
